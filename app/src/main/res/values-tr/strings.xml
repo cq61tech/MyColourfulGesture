@@ -13,7 +13,7 @@
     <string name="status_lsposed_unknown">Henüz algılanmadı</string>
     <string name="status_pill">Pill özelleştirmesi</string>
     <string name="status_pill_inactive">Pasif</string>
-    <string name="status_note">Sistem hook’u bir sonraki aşamada gelecek. Bu sürüm yalnızca uygulama arayüzünü içerir.</string>
+    <string name="status_note">Değişiklikler anında uygulanır. Bir şey değişmezse Sistem Arayüzü’nü yeniden başlat.</string>
 
     <string name="quick_style">Stil</string>
     <string name="quick_style_default">Varsayılan</string>
@@ -60,4 +60,24 @@
     <string name="settings_theme_light">Açık</string>
     <string name="settings_theme_dark">Koyu</string>
     <string name="settings_license">MIT Lisansı ile lisanslıdır</string>
+
+    <string name="module_description">Hareket çubuğunu özelleştir: renk, şeffaflık, boyut ve şekil.</string>
+    <string name="status_lsposed_active">Aktif (%1$s)</string>
+    <string name="status_pill_active">Aktif</string>
+    <string name="status_hint_none">Modülü LSPosed’da etkinleştir, kapsam olarak Sistem Arayüzü’nü seç, sonra Sistem Arayüzü’nü yeniden başlat.</string>
+    <string name="status_hook_class">Hook’lanan: %1$s</string>
+    <string name="status_hook_error">Hook hatası: %1$s</string>
+    <string name="status_restart">Sistem Arayüzü’nü yeniden başlat (root)</string>
+    <string name="cust_enable">Pill’i özelleştir</string>
+    <string name="cust_enable_desc">Kapatınca stok pill anında geri gelir</string>
+    <string name="cust_color_section">Renk</string>
+    <string name="cust_use_custom">Özel renk kullan</string>
+    <string name="cust_hue">Ton</string>
+    <string name="cust_opacity">Opaklık</string>
+    <string name="cust_size_section">Boyut ve şekil</string>
+    <string name="cust_width">Genişlik</string>
+    <string name="cust_height">Yükseklik</string>
+    <string name="cust_corner">Köşe yuvarlaklığı</string>
+    <string name="cust_reset">Varsayılana dön</string>
+    <string name="cust_preview_note">Yaklaşık önizleme. Gerçek pill’i Sistem Arayüzü çizer.</string>
 </resources>

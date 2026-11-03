@@ -13,7 +13,7 @@
     <string name="status_lsposed_unknown">Not detected yet</string>
     <string name="status_pill">Pill customization</string>
     <string name="status_pill_inactive">Inactive</string>
-    <string name="status_note">The system hook arrives in the next stage. This build contains the app interface only.</string>
+    <string name="status_note">Changes apply live. If nothing changes, restart System UI.</string>
 
     <string name="quick_style">Style</string>
     <string name="quick_style_default">Default</string>
@@ -60,4 +60,24 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_license">Licensed under the MIT License</string>
+
+    <string name="module_description">Customize the gesture navigation pill: color, opacity, size and shape.</string>
+    <string name="status_lsposed_active">Active (%1$s)</string>
+    <string name="status_pill_active">Active</string>
+    <string name="status_hint_none">Enable the module in LSPosed, tick System UI as its scope, then restart System UI.</string>
+    <string name="status_hook_class">Hooked: %1$s</string>
+    <string name="status_hook_error">Hook error: %1$s</string>
+    <string name="status_restart">Restart System UI (root)</string>
+    <string name="cust_enable">Customize the pill</string>
+    <string name="cust_enable_desc">Turn off to get the stock pill back instantly</string>
+    <string name="cust_color_section">Color</string>
+    <string name="cust_use_custom">Use a custom color</string>
+    <string name="cust_hue">Hue</string>
+    <string name="cust_opacity">Opacity</string>
+    <string name="cust_size_section">Size and shape</string>
+    <string name="cust_width">Width</string>
+    <string name="cust_height">Height</string>
+    <string name="cust_corner">Corner roundness</string>
+    <string name="cust_reset">Reset to defaults</string>
+    <string name="cust_preview_note">Approximate preview. The real pill is drawn by System UI.</string>
 </resources>

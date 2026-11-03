@@ -12,9 +12,17 @@ import com.mycolourfulgesture.ui.AppRoot
 import com.mycolourfulgesture.ui.theme.MyColourfulGestureTheme
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var settings: AppSettings
+
+    override fun onResume() {
+        super.onResume()
+        if (::settings.isInitialized) settings.bumpResume()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val settings = AppSettings(applicationContext)
+        settings = AppSettings(applicationContext)
+        val pill = PillState(applicationContext)
 
         setContent {
             val systemDark = isSystemInDarkTheme()
@@ -37,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             MyColourfulGestureTheme(darkTheme = dark) {
-                AppRoot(settings)
+                AppRoot(settings, pill)
             }
         }
     }

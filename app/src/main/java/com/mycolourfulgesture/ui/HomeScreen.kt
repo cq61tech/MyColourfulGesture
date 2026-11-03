@@ -43,11 +43,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mycolourfulgesture.AppSettings
 import com.mycolourfulgesture.Constants
+import com.mycolourfulgesture.core.HookStatus
 import com.mycolourfulgesture.R
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(settings: AppSettings) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +58,7 @@ fun HomeScreen() {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         HeroCard()
-        StatusCard()
+        StatusCard(settings)
         QuickCards()
         DeviceCard()
         WhatCard()
@@ -104,7 +106,11 @@ private fun HeroCard() {
 }
 
 @Composable
-private fun StatusCard() {
+private fun StatusCard(settings: AppSettings) {
+    val context = LocalContext.current
+    val tick = settings.resumeTick
+    val status = remember(tick) { HookStatus.read(context) }
+    val active = status.activeThisBoot
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
@@ -112,13 +118,46 @@ private fun StatusCard() {
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SectionTitle(Icons.Rounded.Info, stringResource(R.string.status_title))
-            InfoRow(stringResource(R.string.status_lsposed), stringResource(R.string.status_lsposed_unknown))
-            InfoRow(stringResource(R.string.status_pill), stringResource(R.string.status_pill_inactive))
+            InfoRow(
+                stringResource(R.string.status_lsposed),
+                if (active) stringResource(R.string.status_lsposed_active, status.framework)
+                else stringResource(R.string.status_lsposed_unknown),
+            )
+            InfoRow(
+                stringResource(R.string.status_pill),
+                stringResource(if (active) R.string.status_pill_active else R.string.status_pill_inactive),
+            )
+            val cls = status.hookedClass
+            if (cls != null) {
+                Text(
+                    stringResource(R.string.status_hook_class, cls.substringAfterLast('.')),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+            val err = status.error
+            if (err != null) {
+                Text(
+                    stringResource(R.string.status_hook_error, err),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Text(
-                stringResource(R.string.status_note),
+                stringResource(if (active) R.string.status_note else R.string.status_hint_none),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
+            OutlinedButton(onClick = {
+                Thread {
+                    try {
+                        Runtime.getRuntime().exec(arrayOf("su", "-c", "killall com.android.systemui")).waitFor()
+                    } catch (_: Throwable) {
+                    }
+                }.start()
+            }) {
+                Text(stringResource(R.string.status_restart))
+            }
         }
     }
 }

@@ -11,6 +11,13 @@ class AppSettings(context: Context) {
     var themeMode by mutableIntStateOf(sp.getInt(KEY_THEME, THEME_SYSTEM))
         private set
 
+    var resumeTick by mutableIntStateOf(0)
+        private set
+
+    fun bumpResume() {
+        resumeTick++
+    }
+
     fun updateThemeMode(mode: Int) {
         themeMode = mode
         sp.edit().putInt(KEY_THEME, mode).apply()

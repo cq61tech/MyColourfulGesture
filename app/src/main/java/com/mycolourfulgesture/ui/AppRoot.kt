@@ -20,12 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.mycolourfulgesture.AppSettings
+import com.mycolourfulgesture.PillState
 import com.mycolourfulgesture.R
 
 private data class NavItem(val labelRes: Int, val icon: ImageVector)
 
 @Composable
-fun AppRoot(settings: AppSettings) {
+fun AppRoot(settings: AppSettings, pill: PillState) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val items = listOf(
         NavItem(R.string.nav_home, Icons.Rounded.Home),
@@ -49,8 +50,8 @@ fun AppRoot(settings: AppSettings) {
     ) { inner ->
         Box(Modifier.padding(inner)) {
             when (tab) {
-                0 -> HomeScreen()
-                1 -> CustomizationScreen()
+                0 -> HomeScreen(settings)
+                1 -> CustomizationScreen(pill)
                 else -> SettingsScreen(settings)
             }
         }
