@@ -1,0 +1,240 @@
+package com.mycolourfulgesture.ui
+
+import android.os.Build
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.mycolourfulgesture.Constants
+import com.mycolourfulgesture.R
+
+@Composable
+fun HomeScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        HeroCard()
+        StatusCard()
+        QuickCards()
+        DeviceCard()
+        WhatCard()
+        AboutCard()
+    }
+}
+
+@Composable
+private fun HeroCard() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp)
+            .clip(RoundedCornerShape(32.dp)),
+    ) {
+        Image(
+            painter = painterResource(R.drawable.hero_sky),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color(0xCC000000)),
+                        startY = 120f,
+                    )
+                )
+        )
+        Text(
+            text = stringResource(R.string.hero_title),
+            color = Color.White,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 34.sp,
+                shadow = Shadow(Color(0x66000000), Offset(0f, 3f), 10f),
+            ),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(24.dp),
+        )
+    }
+}
+
+@Composable
+private fun StatusCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        shape = RoundedCornerShape(28.dp),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionTitle(Icons.Rounded.Info, stringResource(R.string.status_title))
+            InfoRow(stringResource(R.string.status_lsposed), stringResource(R.string.status_lsposed_unknown))
+            InfoRow(stringResource(R.string.status_pill), stringResource(R.string.status_pill_inactive))
+            Text(
+                stringResource(R.string.status_note),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickCards() {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_style), stringResource(R.string.quick_style_default))
+        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_monet), stringResource(R.string.quick_monet_off))
+        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_profile), stringResource(R.string.quick_profile_none))
+    }
+}
+
+@Composable
+private fun QuickCard(modifier: Modifier, label: String, value: String) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+private fun DeviceCard() {
+    val isPixel = Build.MANUFACTURER.equals("google", ignoreCase = true)
+    val supported = Build.VERSION.SDK_INT in 31..37
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionTitle(Icons.Rounded.PhoneAndroid, stringResource(R.string.device_title))
+            InfoRow(
+                stringResource(R.string.device_android),
+                "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+            )
+            InfoRow(stringResource(R.string.device_model), "${Build.MANUFACTURER} ${Build.MODEL}")
+            InfoRow(
+                stringResource(R.string.device_ui),
+                stringResource(if (isPixel) R.string.device_ui_pixel else R.string.device_ui_aosp),
+            )
+            InfoRow(
+                stringResource(R.string.device_support),
+                stringResource(if (supported) R.string.device_supported else R.string.device_unsupported),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WhatCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SectionTitle(Icons.Rounded.AutoAwesome, stringResource(R.string.what_title))
+            listOf(R.string.what_1, R.string.what_2, R.string.what_3, R.string.what_4).forEach {
+                Text(
+                    "•  " + stringResource(it),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AboutCard() {
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    val version = remember(context) {
+        runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrNull() ?: "?"
+    }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionTitle(Icons.Rounded.Code, stringResource(R.string.about_title))
+            Text(stringResource(R.string.about_version, version), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(R.string.about_credits),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedButton(onClick = { uriHandler.openUri(Constants.REPO_URL) }) {
+                Text(stringResource(R.string.about_github))
+            }
+        }
+    }
+}
+
+@Composable
+internal fun SectionTitle(icon: ImageVector, title: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Icon(icon, contentDescription = null)
+        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+    }
+}

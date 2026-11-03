@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyColourfulGesture</string>
+
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_customization">Özelleştirme</string>
+    <string name="nav_settings">Ayarlar</string>
+
+    <string name="hero_title">Hayal gücünüz, küçük bir çizgiyi baştan aşağı değiştirebilir</string>
+
+    <string name="status_title">Modül durumu</string>
+    <string name="status_lsposed">LSPosed</string>
+    <string name="status_lsposed_unknown">Henüz algılanmadı</string>
+    <string name="status_pill">Pill özelleştirmesi</string>
+    <string name="status_pill_inactive">Pasif</string>
+    <string name="status_note">Sistem hook’u bir sonraki aşamada gelecek. Bu sürüm yalnızca uygulama arayüzünü içerir.</string>
+
+    <string name="quick_style">Stil</string>
+    <string name="quick_style_default">Varsayılan</string>
+    <string name="quick_monet">Monet</string>
+    <string name="quick_monet_off">Kapalı</string>
+    <string name="quick_profile">Profil</string>
+    <string name="quick_profile_none">Yok</string>
+
+    <string name="device_title">Cihaz</string>
+    <string name="device_android">Android</string>
+    <string name="device_model">Model</string>
+    <string name="device_ui">Sistem arayüzü</string>
+    <string name="device_ui_pixel">Pixel</string>
+    <string name="device_ui_aosp">AOSP / diğer</string>
+    <string name="device_support">Uyumluluk</string>
+    <string name="device_supported">Destekleniyor (Android 12–17)</string>
+    <string name="device_unsupported">Desteklenen aralığın dışında</string>
+
+    <string name="what_title">Neler yapabilirsin?</string>
+    <string name="what_1">Pill’i sabit bir renkle veya Monet paletinle yeniden renklendir</string>
+    <string name="what_2">Boyutunu ve şeklini değiştir: ince çizgi, kalın çubuk, nokta ve daha fazlası</string>
+    <string name="what_3">Konumunu ayarla, klavye, yatay mod ve şarj için farklı stiller ver</string>
+    <string name="what_4">En sevdiğin görünümleri profil olarak kaydet</string>
+
+    <string name="about_title">Hakkında</string>
+    <string name="about_version">Sürüm %1$s</string>
+    <string name="about_credits">MyColourfulGesture katkıcıları tarafından geliştirildi. LSPosed ve Xposed topluluklarına, Material Design ekibine teşekkürler.</string>
+    <string name="about_github">GitHub deposu</string>
+
+    <string name="cust_preview">Canlı önizleme</string>
+    <string name="cust_coming">Yakında. Hook hazır olduğunda bu gruplar pill’i kontrol edecek.</string>
+    <string name="cust_color">Renk ve Monet</string>
+    <string name="cust_color_desc">Sabit renk, dinamik palet, şeffaflık, gradient</string>
+    <string name="cust_size">Boyut ve şekil</string>
+    <string name="cust_size_desc">Genişlik, yükseklik, köşeler, çizgi, alternatif formlar</string>
+    <string name="cust_position">Konum ve davranış</string>
+    <string name="cust_position_desc">Dikey ofset, hizalama, animasyon hızı</string>
+    <string name="cust_context">Bağlamsal stiller</string>
+    <string name="cust_context_desc">Klavye, yatay mod, düşük pil, şarj</string>
+
+    <string name="settings_language">Dil</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Sistem</string>
+    <string name="settings_theme_light">Açık</string>
+    <string name="settings_theme_dark">Koyu</string>
+    <string name="settings_license">MIT Lisansı ile lisanslıdır</string>
+</resources>
