@@ -176,5 +176,5 @@
     <string name="set_dock_autohide_desc">Slides away as you scroll down, returns as you scroll up</string>
     <string name="restart_ok">System UI restart requested</string>
     <string name="restart_fail">Root command failed. Allow root for this app in Magisk or KernelSU, or restart System UI manually.</string>
-    <string name="status_no_draw">Hook is installed, but the pill class has not drawn yet. Lock and unlock once. If this never changes, your ROM draws the pill with a different class.</string>
+    <string name="status_no_draw">The hook is installed, but the hooked method has not been called yet. See the diagnostics line above.</string>
 </resources>

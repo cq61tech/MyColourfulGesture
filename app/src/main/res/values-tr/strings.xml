@@ -176,5 +176,5 @@
     <string name="set_dock_autohide_desc">Aşağı kaydırınca gizlenir, yukarı kaydırınca geri gelir</string>
     <string name="restart_ok">Sistem Arayüzü yeniden başlatılıyor</string>
     <string name="restart_fail">Root komutu başarısız. Magisk veya KernelSU’da bu uygulamaya root izni ver ya da Sistem Arayüzü’nü elle yeniden başlat.</string>
-    <string name="status_no_draw">Hook kurulu ama pill sınıfı henüz çizim yapmadı. Bir kez kilitle ve aç. Hiç değişmezse ROM’un pill’i farklı bir sınıfla çiziyordur.</string>
+    <string name="status_no_draw">Hook kurulu ama yakalanan metod henüz çağrılmadı. Yukarıdaki teşhis satırına bak.</string>
 </resources>

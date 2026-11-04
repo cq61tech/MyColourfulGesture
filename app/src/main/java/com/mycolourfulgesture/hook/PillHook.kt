@@ -27,10 +27,46 @@ class PillHook : XposedModule() {
         }
     }
 
+    private val hookedKeys = HashSet<String>()
+
+    /** Her yakalanan çizim metodunun ortak girişi: hata olursa stok çizime düşer. */
+    private fun guarded(chain: XposedInterface.Chain): Any? {
+        HookClient.entered += 1
+        return try {
+            PillDrawer.onDraw(chain)
+        } catch (t: Throwable) {
+            HookClient.errors += 1
+            if (HookClient.errors <= 3) HookClient.log(Log.ERROR, "intercept failed: $t")
+            chain.proceed()
+        }
+    }
+
+    /** Bulunan view'ın sınıf zincirinde (android.* hariç) ilk onDraw / draw / dispatchDraw'ı yakalar. */
+    private fun hookDrawOf(cls: Class<*>): String {
+        var k: Class<*>? = cls
+        while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
+            for (m in arrayOf("onDraw", "draw", "dispatchDraw")) {
+                val method = try {
+                    k.getDeclaredMethod(m, Canvas::class.java)
+                } catch (_: NoSuchMethodException) {
+                    null
+                } ?: continue
+                val key = k.name + "#" + m
+                if (!hookedKeys.add(key)) return "already ${k.simpleName}.$m"
+                hook(method).intercept(XposedInterface.Hooker { chain -> guarded(chain) })
+                log(Log.INFO, TAG, "Hooked $key (discovered)")
+                return "hooked ${k.simpleName}.$m"
+            }
+            k = k.superclass
+        }
+        return "no draw method in ${cls.simpleName}"
+    }
+
     private fun hookSystemUi(param: XposedModuleInterface.PackageReadyParam) {
         HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
         HookClient.apiVersion = apiVersion
         HookClient.logger = { priority, msg -> log(priority, TAG, msg) }
+        HookClient.hooker = { cls -> hookDrawOf(cls) }
 
         HookClient.startEarly()
 
@@ -39,7 +75,8 @@ class PillHook : XposedModule() {
             try {
                 val clazz = param.classLoader.loadClass(name)
                 val method = clazz.getDeclaredMethod("onDraw", Canvas::class.java)
-                hook(method).intercept(XposedInterface.Hooker { chain -> PillDrawer.onDraw(chain) })
+                hook(method).intercept(XposedInterface.Hooker { chain -> guarded(chain) })
+                hookedKeys.add(name + "#onDraw")
                 HookClient.hookedClass = name
                 HookClient.hookError = null
                 log(Log.INFO, TAG, "Hooked $name.onDraw")

@@ -2,12 +2,14 @@ package com.mycolourfulgesture.hook
 
 import android.content.Context
 import android.database.ContentObserver
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import com.mycolourfulgesture.core.ConfigContract
 import com.mycolourfulgesture.core.HookStatus
 import com.mycolourfulgesture.core.PillConfig
@@ -24,6 +26,10 @@ object HookClient {
     @Volatile var hookError: String? = null
     @Volatile var viewInfo: String? = null
     @Volatile var draws: Int = 0
+    @Volatile var entered: Int = 0
+    @Volatile var errors: Int = 0
+    @Volatile var discovery: String? = null
+    @Volatile var hooker: ((Class<*>) -> String)? = null
     @Volatile var logger: ((Int, String) -> Unit)? = null
 
     private val views: MutableSet<View> =
@@ -34,6 +40,7 @@ object HookClient {
     private var observer: ContentObserver? = null
     private var appContext: Context? = null
     private var loggedOk = false
+    private var lastDiscoveryLog: String? = null
 
     fun log(priority: Int, msg: String) {
         try {
@@ -91,6 +98,8 @@ object HookClient {
             log(Log.WARN, "observer register failed: ${t.javaClass.simpleName}")
         }
         h.post { load(0) }
+        log(Log.INFO, "device: ${Build.MANUFACTURER} ${Build.MODEL} / Android ${Build.VERSION.RELEASE} / ${Build.FINGERPRINT}")
+        longArrayOf(5000L, 20000L, 60000L, 180000L).forEach { d -> main.postDelayed({ discover() }, d) }
         val beat = object : Runnable {
             override fun run() {
                 sendHeartbeatAsync()
@@ -107,9 +116,10 @@ object HookClient {
         putString(HookStatus.K_ERROR, hookError ?: "")
         putString(
             HookStatus.K_PROBE,
-            "draws=$draws cfg=${if (config != null) "ok" else "none"} ${viewInfo ?: ""}".trim(),
+            ("entered=$entered draws=$draws err=$errors cfg=${if (config != null) "ok" else "none"} " +
+                "${discovery ?: ""} ${viewInfo ?: ""}").trim().take(480),
         )
-        putInt(HookStatus.K_DRAWS, draws)
+        putInt(HookStatus.K_DRAWS, entered)
     }
 
     /** "get" çağrısı hem ayarı getirir hem de durumu (heartbeat) uygulamaya yazar. */
@@ -139,6 +149,78 @@ object HookClient {
                 log(Log.WARN, "heartbeat failed: ${t.javaClass.simpleName}")
             }
         }
+    }
+
+    /**
+     * SystemUI pencerelerini tarar, pill view'ını (NavigationHandle / home_handle) bulur,
+     * sınıfının çizim metodunu yakalar ve ne bulduğunu günlüğe yazar.
+     */
+    private fun discover() {
+        val found = ArrayList<View>()
+        val names = LinkedHashSet<String>()
+        var roots = 0
+        try {
+            val wmg = Class.forName("android.view.WindowManagerGlobal")
+            val inst = wmg.getMethod("getInstance").invoke(null)
+            val rootNames = wmg.getMethod("getViewRootNames").invoke(inst) as? Array<*>
+            val getRoot = wmg.getMethod("getRootView", String::class.java)
+            rootNames?.forEach { n ->
+                val root = getRoot.invoke(inst, n) as? View
+                if (root != null) {
+                    roots++
+                    walk(root, found, names, 0)
+                }
+            }
+        } catch (t: Throwable) {
+            discovery = "scan failed: " + t.javaClass.simpleName
+            log(Log.WARN, "discover failed: $t")
+            return
+        }
+
+        val sb = StringBuilder("roots=$roots found=${found.size}")
+        for (v in found.take(3)) {
+            views.add(v)
+            val res = try {
+                hooker?.invoke(v.javaClass) ?: "no hooker"
+            } catch (t: Throwable) {
+                "hook failed: " + t.javaClass.simpleName
+            }
+            sb.append(" | ").append(v.javaClass.simpleName)
+                .append("[").append(idOf(v)).append(" ").append(v.width).append("x").append(v.height)
+                .append(" shown=").append(v.isShown).append("] ").append(res)
+        }
+        if (found.isEmpty() && names.isNotEmpty()) {
+            sb.append(" | nav: ").append(names.take(6).joinToString())
+        }
+        val text = sb.toString()
+        discovery = text
+        if (text != lastDiscoveryLog) {
+            lastDiscoveryLog = text
+            log(Log.INFO, "discover: $text")
+        }
+        sendHeartbeatAsync()
+        invalidateAll()
+    }
+
+    private fun walk(v: View, out: MutableList<View>, names: MutableSet<String>, depth: Int) {
+        if (depth > 40) return
+        val cn = v.javaClass.name
+        val id = idOf(v)
+        val isHandle = cn.contains("NavigationHandle", true) || cn.contains("NavHandle", true) ||
+            cn.contains("HandleView", true) || id == "home_handle"
+        if (isHandle) out.add(v)
+        if (cn.contains("Navigation", true) || id.contains("handle", true)) {
+            names.add(cn.substringAfterLast('.') + (if (id.isNotEmpty()) "#$id" else ""))
+        }
+        if (v is ViewGroup) {
+            for (i in 0 until v.childCount) walk(v.getChildAt(i), out, names, depth + 1)
+        }
+    }
+
+    private fun idOf(v: View): String = try {
+        if (v.id != View.NO_ID) v.resources.getResourceEntryName(v.id) else ""
+    } catch (_: Throwable) {
+        ""
     }
 
     private fun invalidateAll() {
