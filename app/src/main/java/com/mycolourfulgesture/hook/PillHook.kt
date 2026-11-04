@@ -9,10 +9,28 @@ import io.github.libxposed.api.XposedModuleInterface
 class PillHook : XposedModule() {
 
     override fun onPackageReady(param: XposedModuleInterface.PackageReadyParam) {
-        if (param.packageName != SYSTEMUI) return
+        when (param.packageName) {
+            SYSTEMUI -> hookSystemUi(param)
+            OWN_PACKAGE -> hookSelf(param)
+        }
+    }
 
+    /** Uygulamanın kendi sürecinde: "LSPosed modülü yüklendi" bilgisini veren iki fonksiyonu değiştirir. */
+    private fun hookSelf(param: XposedModuleInterface.PackageReadyParam) {
+        try {
+            val c = param.classLoader.loadClass("com.mycolourfulgesture.core.ModuleStatus")
+            val fw = "$frameworkName $frameworkVersion"
+            hook(c.getDeclaredMethod("isModuleActive")).intercept(XposedInterface.Hooker { true })
+            hook(c.getDeclaredMethod("moduleFramework")).intercept(XposedInterface.Hooker { fw })
+        } catch (t: Throwable) {
+            log(Log.WARN, TAG, "self hook failed", t)
+        }
+    }
+
+    private fun hookSystemUi(param: XposedModuleInterface.PackageReadyParam) {
         HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
         HookClient.apiVersion = apiVersion
+        HookClient.logger = { priority, msg -> log(priority, TAG, msg) }
 
         var lastError: String? = null
         for (name in HANDLE_CLASSES) {
@@ -38,6 +56,7 @@ class PillHook : XposedModule() {
     private companion object {
         const val TAG = "MyColourfulGesture"
         const val SYSTEMUI = "com.android.systemui"
+        const val OWN_PACKAGE = "com.mycolourfulgesture"
         val HANDLE_CLASSES = listOf(
             "com.android.systemui.navigationbar.gestural.NavigationHandle",
             "com.android.systemui.navigationbar.views.buttons.NavigationHandle",

@@ -44,7 +44,12 @@ class MainActivity : AppCompatActivity() {
                 onDispose { }
             }
 
-            MyColourfulGestureTheme(darkTheme = dark) {
+            MyColourfulGestureTheme(
+                darkTheme = dark,
+                dynamic = settings.dynamicColor.value,
+                seedHue = settings.seedHue.value,
+                amoled = settings.amoled.value,
+            ) {
                 AppRoot(settings, pill)
             }
         }

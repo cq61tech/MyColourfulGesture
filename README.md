@@ -4,7 +4,7 @@
 
 An LSPosed module that customizes the Gesture Navigation Pill on Pixel and AOSP-based Android 12–17, with a Material 3 Expressive companion app.
 
-> **Status: Stage 2 – hook MVP.** Color, opacity, width, height and corner roundness of the gesture pill, targeting Android 16 first. Other versions are untested.
+> **Status: Stage 3.** Gesture pill: stock/custom/Monet color, gradient, breathing / flowing animation, bar / dot / dots shapes, size, position, outline, presets. App: floating dock, theme options, backup/restore, update check. Android 16 first; other versions untested.
 
 ## Planned features
 
@@ -24,7 +24,7 @@ An LSPosed module that customizes the Gesture Navigation Pill on Pixel and AOSP-
 ## Setup
 
 1. Install the APK and open LSPosed → Modules → enable **MyColourfulGesture**.
-2. Scope: tick **System UI** only.
+2. Scope: tick **System UI** and **MyColourfulGesture** itself (the second one lets the app show an accurate status).
 3. Restart System UI (button on the Home page, or `su -c killall com.android.systemui`).
 4. Open the app → Customize.
 

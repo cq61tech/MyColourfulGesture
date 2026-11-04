@@ -7,10 +7,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 
-/**
- * SystemUI içindeki hook ayarları bu provider'dan okur ve durum bilgisini (heartbeat) buraya yazar.
- * Sadece "get" ve "heartbeat" çağrıları vardır; ayarları dışarıdan değiştirmenin yolu yoktur.
- */
+/** SystemUI'deki hook ayarları buradan okur; "get" ve "heartbeat" çağrıları durum bilgisini de kaydeder. */
 class ConfigProvider : ContentProvider() {
 
     override fun onCreate(): Boolean = true
@@ -18,23 +15,29 @@ class ConfigProvider : ContentProvider() {
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
         val ctx = context ?: return null
         return when (method) {
-            ConfigContract.METHOD_GET ->
+            ConfigContract.METHOD_GET -> {
+                if (extras != null && extras.containsKey(HookStatus.K_FRAMEWORK)) writeStatus(ctx, extras)
                 PillConfig.load(ctx.getSharedPreferences(ConfigContract.PREFS_CONFIG, Context.MODE_PRIVATE)).toBundle()
+            }
 
             ConfigContract.METHOD_HEARTBEAT -> {
-                ctx.getSharedPreferences(ConfigContract.PREFS_STATUS, Context.MODE_PRIVATE).edit()
-                    .putLong(HookStatus.K_TS, System.currentTimeMillis())
-                    .putString(HookStatus.K_FRAMEWORK, extras?.getString(HookStatus.K_FRAMEWORK) ?: "")
-                    .putInt(HookStatus.K_API, extras?.getInt(HookStatus.K_API) ?: 0)
-                    .putString(HookStatus.K_CLASS, extras?.getString(HookStatus.K_CLASS) ?: "")
-                    .putString(HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
-                    .putString(HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
-                    .apply()
+                writeStatus(ctx, extras)
                 Bundle.EMPTY
             }
 
             else -> null
         }
+    }
+
+    private fun writeStatus(ctx: Context, extras: Bundle?) {
+        ctx.getSharedPreferences(ConfigContract.PREFS_STATUS, Context.MODE_PRIVATE).edit()
+            .putLong(HookStatus.K_TS, System.currentTimeMillis())
+            .putString(HookStatus.K_FRAMEWORK, extras?.getString(HookStatus.K_FRAMEWORK) ?: "")
+            .putInt(HookStatus.K_API, extras?.getInt(HookStatus.K_API) ?: 0)
+            .putString(HookStatus.K_CLASS, extras?.getString(HookStatus.K_CLASS) ?: "")
+            .putString(HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
+            .putString(HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
+            .apply()
     }
 
     override fun query(

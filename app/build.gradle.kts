@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val buildNumber: Int? = (project.findProperty("buildNumber") as String?)?.toIntOrNull()
+
 android {
     namespace = "com.mycolourfulgesture"
     compileSdk = 36
@@ -12,8 +14,8 @@ android {
         applicationId = "com.mycolourfulgesture"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 100 + (buildNumber ?: 0)
+        versionName = "0.3.0" + (if (buildNumber != null) "-b$buildNumber" else "")
     }
 
     // Sabit keystore: her CI derlemesi aynı imzayı taşır, böylece APK'lar üzerine güncellenebilir.

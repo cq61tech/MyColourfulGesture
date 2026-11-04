@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import com.mycolourfulgesture.AppSettings
 import com.mycolourfulgesture.Constants
 import com.mycolourfulgesture.core.HookStatus
+import com.mycolourfulgesture.core.isModuleActive
+import com.mycolourfulgesture.core.moduleFramework
 import com.mycolourfulgesture.R
 
 @Composable
@@ -110,7 +112,10 @@ private fun StatusCard(settings: AppSettings) {
     val context = LocalContext.current
     val tick = settings.resumeTick
     val status = remember(tick) { HookStatus.read(context) }
-    val active = status.activeThisBoot
+    val selfActive = remember(tick) { runCatching { isModuleActive() }.getOrDefault(false) }
+    val selfFw = remember(tick) { runCatching { moduleFramework() }.getOrDefault("") }
+    val sysUi = status.activeThisBoot
+    val fw = status.framework.ifBlank { selfFw }.ifBlank { "?" }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
@@ -120,12 +125,15 @@ private fun StatusCard(settings: AppSettings) {
             SectionTitle(Icons.Rounded.Info, stringResource(R.string.status_title))
             InfoRow(
                 stringResource(R.string.status_lsposed),
-                if (active) stringResource(R.string.status_lsposed_active, status.framework)
-                else stringResource(R.string.status_lsposed_unknown),
+                when {
+                    sysUi -> stringResource(R.string.status_lsposed_active, fw)
+                    selfActive -> stringResource(R.string.status_lsposed_partial, fw)
+                    else -> stringResource(R.string.status_lsposed_unknown)
+                },
             )
             InfoRow(
                 stringResource(R.string.status_pill),
-                stringResource(if (active) R.string.status_pill_active else R.string.status_pill_inactive),
+                stringResource(if (sysUi) R.string.status_pill_active else R.string.status_pill_inactive),
             )
             val cls = status.hookedClass
             if (cls != null) {
@@ -143,20 +151,32 @@ private fun StatusCard(settings: AppSettings) {
                     color = MaterialTheme.colorScheme.error,
                 )
             }
+            val probe = status.probe
+            if (probe != null) {
+                Text(
+                    stringResource(R.string.status_diag, probe),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
             Text(
-                stringResource(if (active) R.string.status_note else R.string.status_hint_none),
+                stringResource(
+                    when {
+                        sysUi -> R.string.status_note
+                        selfActive -> R.string.status_partial_hint
+                        else -> R.string.status_hint_none
+                    }
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
-            OutlinedButton(onClick = {
-                Thread {
-                    try {
-                        Runtime.getRuntime().exec(arrayOf("su", "-c", "killall com.android.systemui")).waitFor()
-                    } catch (_: Throwable) {
-                    }
-                }.start()
-            }) {
-                Text(stringResource(R.string.status_restart))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { restartSystemUi() }) {
+                    Text(stringResource(R.string.status_restart))
+                }
+                OutlinedButton(onClick = { settings.bumpResume() }) {
+                    Text(stringResource(R.string.status_refresh))
+                }
             }
         }
     }
@@ -258,6 +278,7 @@ private fun AboutCard() {
             OutlinedButton(onClick = { uriHandler.openUri(Constants.REPO_URL) }) {
                 Text(stringResource(R.string.about_github))
             }
+            UpdateRow()
         }
     }
 }

@@ -24,8 +24,19 @@ class PillState(context: Context) {
         app.contentResolver.notifyChange(ConfigContract.URI, null)
     }
 
-    fun resetToDefaults() {
+    /** Sadece pill görünümünü sıfırlar; ana anahtar ve hata ayıklama ayarı korunur. */
+    fun resetLook() {
+        config = PillConfig(hookEnabled = config.hookEnabled, debug = config.debug)
+        commit()
+    }
+
+    fun resetAll() {
         config = PillConfig()
+        commit()
+    }
+
+    fun import(new: PillConfig) {
+        config = new
         commit()
     }
 }

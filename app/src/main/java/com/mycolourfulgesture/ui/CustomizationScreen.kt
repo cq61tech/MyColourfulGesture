@@ -2,8 +2,7 @@ package com.mycolourfulgesture.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,45 +11,55 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mycolourfulgesture.PillState
 import com.mycolourfulgesture.R
+import com.mycolourfulgesture.core.MonetColors
 import com.mycolourfulgesture.core.PillConfig
-import kotlin.math.roundToInt
 
-private val SWATCHES = listOf(
-    0xFFFFFFFF, 0xFF000000, 0xFFFF5C8A, 0xFFB05CC4, 0xFF5B8CFF, 0xFF4CD39B, 0xFFFFB84D,
-).map { it.toInt() }
+private data class Preset(val nameRes: Int, val cfg: PillConfig)
+
+private val PRESETS = listOf(
+    Preset(R.string.preset_neon, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00E5FF.toInt(), heightPct = 150, animMode = PillConfig.ANIM_BREATHE)),
+    Preset(R.string.preset_sunset, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF7A59.toInt(), gradient = true,
+        color2 = 0xFFB05CC4.toInt(), widthPct = 70, heightPct = 140)),
+    Preset(R.string.preset_soft, PillConfig(
+        colorMode = PillConfig.COLOR_MONET, monetSource = 1, monetShade = 4, alphaPct = 90, heightPct = 120)),
+    Preset(R.string.preset_minimal, PillConfig(alphaPct = 70, widthPct = 40, heightPct = 60)),
+    Preset(R.string.preset_chunky, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = -1, widthPct = 60, heightPct = 280, cornerPct = 40,
+        strokeDp10 = 15, strokeColor = 0xFF000000.toInt())),
+    Preset(R.string.preset_dots, PillConfig(
+        colorMode = PillConfig.COLOR_MONET, monetSource = 1, monetShade = 5, shape = PillConfig.SHAPE_DOTS, heightPct = 130)),
+)
 
 @Composable
 fun CustomizationScreen(state: PillState) {
     val cfg = state.config
+    val commit = { state.commit() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,155 +87,244 @@ fun CustomizationScreen(state: PillState) {
                 checked = cfg.enabled,
             ) {
                 state.update(state.config.copy(enabled = it))
-                state.commit()
+                commit()
             }
         }
 
+        // ---------- Hazır stiller ----------
         Block {
-            Text(stringResource(R.string.cust_color_section), style = MaterialTheme.typography.titleMedium)
-            SwitchRow(
-                title = stringResource(R.string.cust_use_custom),
-                desc = null,
-                checked = cfg.useCustomColor,
+            BlockTitle(stringResource(R.string.cust_presets))
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                state.update(state.config.copy(useCustomColor = it))
-                state.commit()
+                PRESETS.forEach { p ->
+                    AssistChip(
+                        onClick = {
+                            val cur = state.config
+                            state.update(p.cfg.copy(hookEnabled = cur.hookEnabled, debug = cur.debug, enabled = true))
+                            commit()
+                        },
+                        label = { Text(stringResource(p.nameRes)) },
+                    )
+                }
             }
-            if (cfg.useCustomColor) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SWATCHES.forEach { c ->
-                        val selected = c == cfg.color
-                        Box(
-                            Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(Color(c))
-                                .border(
-                                    if (selected) 3.dp else 1.dp,
-                                    if (selected) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.outlineVariant,
-                                    CircleShape,
-                                )
-                                .clickable {
-                                    state.update(state.config.copy(color = c))
-                                    state.commit()
-                                }
+        }
+
+        // ---------- Renk ----------
+        Block {
+            BlockTitle(stringResource(R.string.cust_color_section))
+            Segments(
+                options = listOf(
+                    stringResource(R.string.color_stock),
+                    stringResource(R.string.color_custom),
+                    stringResource(R.string.color_monet),
+                ),
+                selected = cfg.colorMode,
+            ) {
+                state.update(state.config.copy(colorMode = it))
+                commit()
+            }
+
+            if (cfg.colorMode == PillConfig.COLOR_CUSTOM) {
+                ColorPicker(
+                    color = cfg.color,
+                    onChange = { state.update(state.config.copy(color = it)) },
+                    onCommit = commit,
+                )
+            }
+
+            if (cfg.colorMode == PillConfig.COLOR_MONET) {
+                val names = listOf(
+                    R.string.monet_accent1, R.string.monet_accent2, R.string.monet_accent3,
+                    R.string.monet_neutral1, R.string.monet_neutral2,
+                )
+                Row(
+                    Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    names.forEachIndexed { i, res ->
+                        FilterChip(
+                            selected = cfg.monetSource == i + 1,
+                            onClick = {
+                                state.update(state.config.copy(monetSource = i + 1))
+                                commit()
+                            },
+                            label = { Text(stringResource(res)) },
                         )
                     }
                 }
-                var hue by remember { mutableFloatStateOf(hueOf(cfg.color)) }
-                SliderRow(
-                    label = stringResource(R.string.cust_hue),
-                    valueText = "${hue.roundToInt()}°",
-                    value = hue,
-                    range = 0f..360f,
-                    onChange = {
-                        hue = it
-                        state.update(state.config.copy(color = Color.hsv(it, 1f, 1f).toArgb()))
-                    },
-                    onFinished = { state.commit() },
+                IntSlider(
+                    label = stringResource(R.string.cust_monet_shade),
+                    suffix = "",
+                    value = cfg.monetShade,
+                    range = 0..(PillConfig.MONET_SHADES.size - 1),
+                    onChange = { state.update(state.config.copy(monetShade = it)) },
+                    onFinished = commit,
+                    display = { PillConfig.MONET_SHADES[it].toString() },
                 )
             }
-            SliderRow(
+
+            IntSlider(
                 label = stringResource(R.string.cust_opacity),
-                valueText = "${cfg.alphaPct}%",
-                value = cfg.alphaPct.toFloat(),
-                range = 10f..100f,
-                onChange = { state.update(state.config.copy(alphaPct = it.roundToInt())) },
-                onFinished = { state.commit() },
+                suffix = "%",
+                value = cfg.alphaPct,
+                range = 0..100,
+                onChange = { state.update(state.config.copy(alphaPct = it)) },
+                onFinished = commit,
             )
+
+            SwitchRow(
+                title = stringResource(R.string.cust_gradient),
+                desc = null,
+                checked = cfg.gradient,
+            ) {
+                state.update(state.config.copy(gradient = it))
+                commit()
+            }
+            if (cfg.gradient) {
+                Text(stringResource(R.string.cust_gradient_color), style = MaterialTheme.typography.bodyMedium)
+                ColorPicker(
+                    color = cfg.color2,
+                    onChange = { state.update(state.config.copy(color2 = it)) },
+                    onCommit = commit,
+                )
+            }
         }
 
+        // ---------- Animasyon ----------
         Block {
-            Text(stringResource(R.string.cust_size_section), style = MaterialTheme.typography.titleMedium)
-            SliderRow(
-                label = stringResource(R.string.cust_width),
-                valueText = "${cfg.widthPct}%",
-                value = cfg.widthPct.toFloat(),
-                range = 30f..100f,
-                onChange = { state.update(state.config.copy(widthPct = it.roundToInt())) },
-                onFinished = { state.commit() },
-            )
-            SliderRow(
+            BlockTitle(stringResource(R.string.cust_anim_section))
+            Segments(
+                options = listOf(
+                    stringResource(R.string.anim_none),
+                    stringResource(R.string.anim_breathe),
+                    stringResource(R.string.anim_flow),
+                ),
+                selected = cfg.animMode,
+            ) {
+                state.update(state.config.copy(animMode = it))
+                commit()
+            }
+            if (cfg.animMode != PillConfig.ANIM_NONE) {
+                IntSlider(
+                    label = stringResource(R.string.cust_anim_speed),
+                    suffix = "%",
+                    value = cfg.animSpeed,
+                    range = 30..300,
+                    onChange = { state.update(state.config.copy(animSpeed = it)) },
+                    onFinished = commit,
+                )
+            }
+        }
+
+        // ---------- Boyut ve şekil ----------
+        Block {
+            BlockTitle(stringResource(R.string.cust_size_section))
+            Segments(
+                options = listOf(
+                    stringResource(R.string.shape_bar),
+                    stringResource(R.string.shape_dot),
+                    stringResource(R.string.shape_dots),
+                ),
+                selected = cfg.shape,
+            ) {
+                state.update(state.config.copy(shape = it))
+                commit()
+            }
+            if (cfg.shape == PillConfig.SHAPE_BAR) {
+                IntSlider(
+                    label = stringResource(R.string.cust_width),
+                    suffix = "%",
+                    value = cfg.widthPct,
+                    range = 10..100,
+                    onChange = { state.update(state.config.copy(widthPct = it)) },
+                    onFinished = commit,
+                )
+            }
+            IntSlider(
                 label = stringResource(R.string.cust_height),
-                valueText = "${cfg.heightPct}%",
-                value = cfg.heightPct.toFloat(),
-                range = 50f..400f,
-                onChange = { state.update(state.config.copy(heightPct = it.roundToInt())) },
-                onFinished = { state.commit() },
+                suffix = "%",
+                value = cfg.heightPct,
+                range = 30..600,
+                onChange = { state.update(state.config.copy(heightPct = it)) },
+                onFinished = commit,
             )
-            SliderRow(
-                label = stringResource(R.string.cust_corner),
-                valueText = "${cfg.cornerPct}%",
-                value = cfg.cornerPct.toFloat(),
-                range = 0f..100f,
-                onChange = { state.update(state.config.copy(cornerPct = it.roundToInt())) },
-                onFinished = { state.commit() },
+            if (cfg.shape == PillConfig.SHAPE_BAR) {
+                IntSlider(
+                    label = stringResource(R.string.cust_corner),
+                    suffix = "%",
+                    value = cfg.cornerPct,
+                    range = 0..100,
+                    onChange = { state.update(state.config.copy(cornerPct = it)) },
+                    onFinished = commit,
+                )
+            }
+        }
+
+        // ---------- Konum ----------
+        Block {
+            BlockTitle(stringResource(R.string.cust_position_section))
+            IntSlider(
+                label = stringResource(R.string.cust_offset),
+                suffix = " dp",
+                value = cfg.offsetDp,
+                range = -8..30,
+                onChange = { state.update(state.config.copy(offsetDp = it)) },
+                onFinished = commit,
+            )
+            IntSlider(
+                label = stringResource(R.string.cust_halign),
+                suffix = "",
+                value = cfg.hAlign,
+                range = -100..100,
+                onChange = { state.update(state.config.copy(hAlign = it)) },
+                onFinished = commit,
             )
         }
 
-        OutlinedButton(onClick = { state.resetToDefaults() }) {
+        // ---------- Kenar çizgisi ----------
+        Block {
+            BlockTitle(stringResource(R.string.cust_stroke_section))
+            IntSlider(
+                label = stringResource(R.string.cust_stroke_width),
+                suffix = "",
+                value = cfg.strokeDp10,
+                range = 0..40,
+                onChange = { state.update(state.config.copy(strokeDp10 = it)) },
+                onFinished = commit,
+                display = { "%.1f dp".format(it / 10f) },
+            )
+            if (cfg.strokeDp10 > 0) {
+                Text(stringResource(R.string.cust_stroke_color), style = MaterialTheme.typography.bodyMedium)
+                ColorPicker(
+                    color = cfg.strokeColor,
+                    onChange = { state.update(state.config.copy(strokeColor = it)) },
+                    onCommit = commit,
+                )
+            }
+        }
+
+        OutlinedButton(onClick = { state.resetLook() }) {
             Text(stringResource(R.string.cust_reset))
         }
     }
 }
 
-@Composable
-private fun Block(content: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            content()
-        }
-    }
-}
-
-@Composable
-private fun SwitchRow(title: String, desc: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
-            if (desc != null) {
-                Text(
-                    desc,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        Switch(checked = checked, onCheckedChange = onChange)
-    }
-}
-
-@Composable
-private fun SliderRow(
-    label: String,
-    valueText: String,
-    value: Float,
-    range: ClosedFloatingPointRange<Float>,
-    onChange: (Float) -> Unit,
-    onFinished: () -> Unit,
-) {
-    Column {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, style = MaterialTheme.typography.bodyMedium)
-            Text(valueText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-        }
-        Slider(
-            value = value,
-            onValueChange = onChange,
-            valueRange = range,
-            onValueChangeFinished = onFinished,
-        )
-    }
-}
-
+/** Yaklaşık önizleme: gerçek pill'in görünümü SystemUI'deki varsayılan ölçülere göre değişebilir. */
 @Composable
 private fun PillPreview(cfg: PillConfig) {
-    val base = if (cfg.useCustomColor) Color(cfg.color) else MaterialTheme.colorScheme.onSurface
+    val context = LocalContext.current
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val c1 = when (cfg.colorMode) {
+        PillConfig.COLOR_CUSTOM -> Color(cfg.color)
+        PillConfig.COLOR_MONET -> Color(MonetColors.resolve(context, cfg.monetSource, cfg.monetShade))
+        else -> onSurface
+    }
+    val c2 = Color(cfg.color2)
+    val sc = Color(cfg.strokeColor)
+    val a = cfg.alphaPct / 100f
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -236,23 +334,51 @@ private fun PillPreview(cfg: PillConfig) {
     ) {
         Canvas(Modifier.fillMaxSize()) {
             val d = density
-            val w = (108f * d * cfg.widthPct / 100f).coerceAtMost(size.width)
-            val h = (4f * d * cfg.heightPct / 100f).coerceAtMost(size.height / 2f)
-            val x = (size.width - w) / 2f
-            val y = size.height - 20f * d - h
-            val r = h / 2f * cfg.cornerPct / 100f
-            drawRoundRect(
-                color = base.copy(alpha = cfg.alphaPct / 100f),
-                topLeft = Offset(x, y),
-                size = Size(w, h),
-                cornerRadius = CornerRadius(r, r),
-            )
+            val pillH = (4f * d * cfg.heightPct / 100f).coerceIn(1f, size.height / 2f)
+            val gap = pillH * 0.9f
+            val totalW = when (cfg.shape) {
+                PillConfig.SHAPE_DOT -> pillH
+                PillConfig.SHAPE_DOTS -> pillH * 3f + gap * 2f
+                else -> 108f * d * cfg.widthPct / 100f
+            }.coerceIn(1f, size.width)
+            val free = size.width - totalW
+            val left = (free / 2f * (1f + cfg.hAlign / 100f)).coerceIn(0f, free)
+            val bottom = size.height - 20f * d - cfg.offsetDp * d
+            val top = bottom - pillH
+            val corner = pillH / 2f * cfg.cornerPct / 100f
+
+            val brush: Brush = if (cfg.gradient) {
+                Brush.horizontalGradient(listOf(c1, c2), startX = left, endX = left + totalW)
+            } else {
+                SolidColor(c1)
+            }
+
+            fun shapes(inset: Float, draw: (Float, Float, Float, Float, Float) -> Unit) {
+                val i = inset / 2f
+                if (cfg.shape == PillConfig.SHAPE_DOTS) {
+                    for (k in 0..2) {
+                        val x = left + k * (pillH + gap)
+                        draw(x + i, top + i, pillH - inset, pillH - inset, (pillH - inset) / 2f)
+                    }
+                } else {
+                    val r = if (cfg.shape == PillConfig.SHAPE_DOT) pillH / 2f else corner
+                    draw(left + i, top + i, totalW - inset, pillH - inset, maxOf(r - i, 0f))
+                }
+            }
+
+            shapes(0f) { x, y, w, h, r ->
+                if (w > 0f && h > 0f) {
+                    drawRoundRect(brush = brush, topLeft = Offset(x, y), size = Size(w, h), cornerRadius = CornerRadius(r, r), alpha = a)
+                }
+            }
+            if (cfg.strokeDp10 > 0) {
+                val sw = cfg.strokeDp10 / 10f * d
+                shapes(sw) { x, y, w, h, r ->
+                    if (w > 0f && h > 0f) {
+                        drawRoundRect(color = sc, topLeft = Offset(x, y), size = Size(w, h), cornerRadius = CornerRadius(r, r), alpha = a, style = Stroke(width = sw))
+                    }
+                }
+            }
         }
     }
-}
-
-private fun hueOf(argb: Int): Float {
-    val hsv = FloatArray(3)
-    android.graphics.Color.colorToHSV(argb, hsv)
-    return hsv[0]
 }
