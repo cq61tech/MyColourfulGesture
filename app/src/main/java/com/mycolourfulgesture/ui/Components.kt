@@ -180,12 +180,16 @@ private fun hueOf(argb: Int): Float {
     return hsv[0]
 }
 
-internal fun restartSystemUi(context: Context) {
+internal fun restartSystemUi(context: Context) = restartProcess(context, "com.android.systemui")
+
+/** Başlatıcıyı / SystemUI'yi root ile yeniden başlatır; sonucu bildirim olarak gösterir. */
+internal fun restartProcess(context: Context, pkg: String) {
     val app = context.applicationContext
     Thread {
         var ok = false
         try {
-            val cmd = "killall com.android.systemui || pkill -f com.android.systemui || am crash com.android.systemui"
+            val last = if (pkg == "com.android.systemui") "am crash $pkg" else "am force-stop $pkg"
+            val cmd = "killall $pkg || pkill -f $pkg || $last"
             ok = Runtime.getRuntime().exec(arrayOf("su", "-c", cmd)).waitFor() == 0
         } catch (_: Throwable) {
         }
@@ -193,6 +197,14 @@ internal fun restartSystemUi(context: Context) {
             Toast.makeText(app, app.getString(if (ok) R.string.restart_ok else R.string.restart_fail), Toast.LENGTH_LONG).show()
         }
     }.start()
+}
+
+/** Varsayılan ana ekran (başlatıcı) uygulamasının paket adı. */
+internal fun defaultHomePackage(context: Context): String? = try {
+    val intent = android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_HOME)
+    context.packageManager.resolveActivity(intent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+} catch (_: Throwable) {
+    null
 }
 
 @Composable

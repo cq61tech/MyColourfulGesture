@@ -12,6 +12,7 @@ class PillHook : XposedModule() {
         when (param.packageName) {
             SYSTEMUI -> hookSystemUi(param)
             OWN_PACKAGE -> hookSelf(param)
+            else -> hookLauncher(param)
         }
     }
 
@@ -28,6 +29,44 @@ class PillHook : XposedModule() {
     }
 
     private val hookedKeys = HashSet<String>()
+
+    /**
+     * Başlatıcı (Pixel Launcher / Launcher3 / Trebuchet) gibi kapsama eklenen diğer uygulamalar:
+     * pill'i görünüm ağacında arar, bulunca arka planını değiştirir.
+     */
+    private fun hookLauncher(param: XposedModuleInterface.PackageReadyParam) {
+        HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
+        HookClient.apiVersion = apiVersion
+        HookClient.logger = { priority, msg -> log(priority, TAG, msg) }
+        HookClient.suppressHooker = { cls -> hookSuppress(cls) }
+        log(Log.INFO, TAG, "Launcher mode: ${param.packageName}")
+        HookClient.startEarly()
+    }
+
+    /** Stilli view'ın orijinal onDraw'unu bastırır (aynı pill'in iki kez çizilmesini önler). */
+    private fun hookSuppress(cls: Class<*>): String {
+        var k: Class<*>? = cls
+        while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
+            val method = try {
+                k.getDeclaredMethod("onDraw", Canvas::class.java)
+            } catch (_: NoSuchMethodException) {
+                null
+            }
+            if (method != null) {
+                val key = k.name + "#suppress"
+                if (!hookedKeys.add(key)) return "suppress already"
+                hook(method).intercept(XposedInterface.Hooker { chain ->
+                    val cfg = HookClient.config
+                    if (HookClient.isStyled(chain.thisObject) && cfg != null &&
+                        cfg.hookEnabled && cfg.enabled && !cfg.isIdentity
+                    ) null else chain.proceed()
+                })
+                return "suppress ${k.simpleName}.onDraw"
+            }
+            k = k.superclass
+        }
+        return "no onDraw"
+    }
 
     /** Her yakalanan çizim metodunun ortak girişi: hata olursa stok çizime düşer. */
     private fun guarded(chain: XposedInterface.Chain): Any? {

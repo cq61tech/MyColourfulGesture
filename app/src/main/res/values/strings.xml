@@ -177,4 +177,7 @@
     <string name="restart_ok">System UI restart requested</string>
     <string name="restart_fail">Root command failed. Allow root for this app in Magisk or KernelSU, or restart System UI manually.</string>
     <string name="status_no_draw">The hook is installed, but the hooked method has not been called yet. See the diagnostics line above.</string>
+    <string name="status_launcher">Launcher</string>
+    <string name="status_launcher_hint">On this device the pill is probably drawn by your launcher (%1$s). In LSPosed, tick that app in this module’s scope, then restart it.</string>
+    <string name="status_restart_launcher">Restart launcher (root)</string>
 </resources>

@@ -1,34 +1,19 @@
 package com.mycolourfulgesture.hook
 
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Shader
-import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import com.mycolourfulgesture.core.MonetColors
 import com.mycolourfulgesture.core.PillConfig
 import io.github.libxposed.api.XposedInterface
 import java.lang.reflect.Field
-import kotlin.math.PI
-import kotlin.math.max
-import kotlin.math.sin
 
 /**
- * NavigationHandle.onDraw yerine geçer. Hata olursa veya ayar "stok" ise orijinal çizime düşer.
+ * onDraw ile çizilen pill'ler için (SystemUI NavigationHandle). Hata olursa veya ayar "stok" ise orijinal çizime düşer.
  * Stok çizim: pill = view genişliğinde, yüksekliği 2*mRadius, alt kenarı (yükseklik - mBottom).
  */
 object PillDrawer {
-    private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
-    private val matrix = Matrix()
     private val fieldCache = HashMap<String, Field?>()
-    private var monetKey = -1
-    private var monetAt = 0L
-    private var monetColor = Color.WHITE
 
     fun onDraw(chain: XposedInterface.Chain): Any? {
         val view = chain.thisObject as? View
@@ -63,14 +48,9 @@ object PillDrawer {
         val h = view.height.toFloat()
         if (w <= 0f || h <= 0f) return
 
-        val radius0 = readFloat(view, "mRadius")
-        val bottom0 = readFloat(view, "mBottom")
-        val stockColor = readPaintColor(view)
+        val baseHeight = (readFloat(view, "mRadius") ?: (2f * d)) * 2f
+        val bottomMargin = readFloat(view, "mBottom") ?: (8f * d)
 
-        val baseHeight = (radius0 ?: (2f * d)) * 2f
-        val bottomMargin = bottom0 ?: (8f * d)
-
-        // ---- geometri ----
         val pillH = (baseHeight * cfg.heightPct / 100f).coerceIn(1f, h)
         val gap = pillH * 0.9f
         val totalW = when (cfg.shape) {
@@ -84,79 +64,8 @@ object PillDrawer {
         val top = bottom - pillH
         val corner = pillH / 2f * cfg.cornerPct / 100f
 
-        // ---- renk / animasyon ----
-        val c1 = when (cfg.colorMode) {
-            PillConfig.COLOR_CUSTOM -> cfg.color
-            PillConfig.COLOR_MONET -> monet(view, cfg)
-            else -> stockColor ?: Color.WHITE
-        }
-        val baseAlpha = if (cfg.colorMode == PillConfig.COLOR_STOCK) Color.alpha(c1) else 255
-        val now = SystemClock.uptimeMillis()
-        val speed = cfg.animSpeed / 100f
-        var alphaF = cfg.alphaPct / 100f
-        if (cfg.animMode == PillConfig.ANIM_BREATHE) {
-            val period = (2400f / speed).toLong().coerceAtLeast(300L)
-            val phase = (now % period).toFloat() / period
-            alphaF *= 0.55f + 0.45f * (0.5f + 0.5f * sin(2.0 * PI * phase).toFloat())
-        }
-
-        if (cfg.gradient != 0) {
-            val sh = if (cfg.gradient == 2) {
-                LinearGradient(left, 0f, left + totalW, 0f, PillConfig.RAINBOW, null, Shader.TileMode.MIRROR)
-            } else {
-                LinearGradient(left, 0f, left + totalW, 0f, c1, cfg.color2, Shader.TileMode.MIRROR)
-            }
-            if (cfg.animMode == PillConfig.ANIM_FLOW) {
-                val period = (3000f / speed).toLong().coerceAtLeast(400L)
-                matrix.setTranslate((now % period).toFloat() / period * totalW * 2f, 0f)
-                sh.setLocalMatrix(matrix)
-            }
-            fill.shader = sh
-        } else {
-            fill.shader = null
-        }
-        fill.color = c1
-        fill.alpha = (baseAlpha * alphaF).toInt().coerceIn(0, 255)
-
-        drawShape(canvas, fill, left, top, totalW, pillH, gap, corner, cfg.shape, 0f)
-
-        if (cfg.strokeDp10 > 0) {
-            val sw = cfg.strokeDp10 / 10f * d
-            stroke.strokeWidth = sw
-            stroke.color = cfg.strokeColor
-            stroke.alpha = (Color.alpha(cfg.strokeColor) * alphaF).toInt().coerceIn(0, 255)
-            drawShape(canvas, stroke, left, top, totalW, pillH, gap, corner, cfg.shape, sw)
-        }
-
-        if (cfg.animMode != PillConfig.ANIM_NONE) view.postInvalidateDelayed(40L)
-    }
-
-    private fun drawShape(
-        c: Canvas, p: Paint, left: Float, top: Float, totalW: Float, pillH: Float,
-        gap: Float, corner: Float, shape: Int, inset: Float,
-    ) {
-        val i = inset / 2f
-        if (shape == PillConfig.SHAPE_DOTS) {
-            for (k in 0..2) {
-                val x = left + k * (pillH + gap)
-                c.drawRoundRect(x + i, top + i, x + pillH - i, top + pillH - i, pillH / 2f, pillH / 2f, p)
-            }
-        } else {
-            val r = if (shape == PillConfig.SHAPE_DOT) pillH / 2f else corner
-            val rr = max(r - i, 0f)
-            c.drawRoundRect(left + i, top + i, left + totalW - i, top + pillH - i, rr, rr, p)
-        }
-    }
-
-    private fun monet(view: View, cfg: PillConfig): Int {
-        val key = cfg.monetSource * 100 + cfg.monetShade
-        val now = SystemClock.uptimeMillis()
-        if (key != monetKey || now - monetAt > 5000L) {
-            monetKey = key
-            monetAt = now
-            monetColor = MonetColors.resolve(view.context, cfg.monetSource, cfg.monetShade)
-        }
-        return monetColor
+        val animating = PillRenderer.render(canvas, view.context, cfg, left, top, totalW, pillH, gap, corner, d, readPaintColor(view))
+        if (animating) view.postInvalidateDelayed(40L)
     }
 
     private fun readFloat(view: View, name: String): Float? = try {

@@ -177,4 +177,7 @@
     <string name="restart_ok">Sistem Arayüzü yeniden başlatılıyor</string>
     <string name="restart_fail">Root komutu başarısız. Magisk veya KernelSU’da bu uygulamaya root izni ver ya da Sistem Arayüzü’nü elle yeniden başlat.</string>
     <string name="status_no_draw">Hook kurulu ama yakalanan metod henüz çağrılmadı. Yukarıdaki teşhis satırına bak.</string>
+    <string name="status_launcher">Başlatıcı</string>
+    <string name="status_launcher_hint">Bu cihazda pill muhtemelen başlatıcı tarafından çiziliyor (%1$s). LSPosed’da bu modülün kapsamında o uygulamayı işaretle, sonra yeniden başlat.</string>
+    <string name="status_restart_launcher">Başlatıcıyı yeniden başlat (root)</string>
 </resources>

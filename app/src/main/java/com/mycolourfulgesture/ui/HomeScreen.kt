@@ -134,10 +134,13 @@ private fun StatusCard(settings: AppSettings) {
                     else -> stringResource(R.string.status_lsposed_unknown)
                 },
             )
+            val pillActive = status.draws > 0
+            val home = remember(tick) { defaultHomePackage(context) }
             InfoRow(
                 stringResource(R.string.status_pill),
-                stringResource(if (sysUi) R.string.status_pill_active else R.string.status_pill_inactive),
+                stringResource(if (pillActive) R.string.status_pill_active else R.string.status_pill_inactive),
             )
+            if (home != null) InfoRow(stringResource(R.string.status_launcher), home)
             val cls = status.hookedClass
             if (cls != null) {
                 Text(
@@ -162,12 +165,19 @@ private fun StatusCard(settings: AppSettings) {
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
-            if (sysUi && status.draws == 0) {
+            if (sysUi && !pillActive) {
                 Text(
                     stringResource(R.string.status_no_draw),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
+                if (home != null) {
+                    Text(
+                        stringResource(R.string.status_launcher_hint, home),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                }
             }
             Text(
                 stringResource(
@@ -182,6 +192,11 @@ private fun StatusCard(settings: AppSettings) {
             )
             OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { restartSystemUi(context) }) {
                 Text(stringResource(R.string.status_restart))
+            }
+            if (home != null) {
+                OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { restartProcess(context, home) }) {
+                    Text(stringResource(R.string.status_restart_launcher))
+                }
             }
             OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { settings.bumpResume() }) {
                 Text(stringResource(R.string.status_refresh))

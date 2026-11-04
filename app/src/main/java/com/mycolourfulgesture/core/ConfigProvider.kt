@@ -30,14 +30,15 @@ class ConfigProvider : ContentProvider() {
     }
 
     private fun writeStatus(ctx: Context, extras: Bundle?) {
+        val p = HookStatus.slotPrefix(extras?.getString(HookStatus.K_PKG))
         ctx.getSharedPreferences(ConfigContract.PREFS_STATUS, Context.MODE_PRIVATE).edit()
-            .putLong(HookStatus.K_TS, System.currentTimeMillis())
-            .putString(HookStatus.K_FRAMEWORK, extras?.getString(HookStatus.K_FRAMEWORK) ?: "")
-            .putInt(HookStatus.K_API, extras?.getInt(HookStatus.K_API) ?: 0)
-            .putString(HookStatus.K_CLASS, extras?.getString(HookStatus.K_CLASS) ?: "")
-            .putString(HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
-            .putString(HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
-            .putInt(HookStatus.K_DRAWS, extras?.getInt(HookStatus.K_DRAWS) ?: 0)
+            .putLong(p + HookStatus.K_TS, System.currentTimeMillis())
+            .putString(p + HookStatus.K_FRAMEWORK, extras?.getString(HookStatus.K_FRAMEWORK) ?: "")
+            .putInt(p + HookStatus.K_API, extras?.getInt(HookStatus.K_API) ?: 0)
+            .putString(p + HookStatus.K_CLASS, extras?.getString(HookStatus.K_CLASS) ?: "")
+            .putString(p + HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
+            .putString(p + HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
+            .putInt(p + HookStatus.K_DRAWS, extras?.getInt(HookStatus.K_DRAWS) ?: 0)
             .apply()
     }
 

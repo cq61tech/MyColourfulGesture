@@ -30,10 +30,15 @@ object HookClient {
     @Volatile var errors: Int = 0
     @Volatile var discovery: String? = null
     @Volatile var hooker: ((Class<*>) -> String)? = null
+    @Volatile var suppressHooker: ((Class<*>) -> String)? = null
+    @Volatile var pkg: String = ""
     @Volatile var logger: ((Int, String) -> Unit)? = null
 
     private val views: MutableSet<View> =
         Collections.synchronizedSet(Collections.newSetFromMap(WeakHashMap<View, Boolean>()))
+    private val styled: MutableSet<View> =
+        Collections.synchronizedSet(Collections.newSetFromMap(WeakHashMap<View, Boolean>()))
+    private var foundOnce = false
     private val started = AtomicBoolean(false)
     private val main = Handler(Looper.getMainLooper())
     private var handler: Handler? = null
@@ -41,6 +46,17 @@ object HookClient {
     private var appContext: Context? = null
     private var loggedOk = false
     private var lastDiscoveryLog: String? = null
+
+    val isSystemUi: Boolean get() = pkg == "com.android.systemui"
+
+    fun isStyled(v: Any?): Boolean = v is View && styled.contains(v)
+
+    /** Launcher modunda: bulunan pill view'larına güncel ayarı uygular (ana iş parçacığı). */
+    private fun applyStylesNow() {
+        val cfg = config
+        val snap = synchronized(styled) { styled.toList() }
+        snap.forEach { ViewStyler.apply(it, cfg) }
+    }
 
     fun log(priority: Int, msg: String) {
         try {
@@ -55,7 +71,10 @@ object HookClient {
     }
 
     private fun ensureStarted(ctx: Context) {
-        if (started.compareAndSet(false, true)) start(ctx)
+        if (started.compareAndSet(false, true)) {
+            pkg = ctx.packageName ?: ""
+            start(ctx)
+        }
     }
 
     /** Çizim beklemeden başlar: uygulama bağlamı hazır olana kadar saniyede bir dener. */
@@ -99,10 +118,21 @@ object HookClient {
         }
         h.post { load(0) }
         log(Log.INFO, "device: ${Build.MANUFACTURER} ${Build.MODEL} / Android ${Build.VERSION.RELEASE} / ${Build.FINGERPRINT}")
-        longArrayOf(5000L, 20000L, 60000L, 180000L).forEach { d -> main.postDelayed({ discover() }, d) }
+        longArrayOf(4000L, 10000L, 20000L, 40000L, 70000L).forEach { d -> main.postDelayed({ discover() }, d) }
+        if (!isSystemUi) {
+            // Launcher modunda arka plan değiştirilirse (ör. renk animasyonu) stili yeniden uygula.
+            val restyle = object : Runnable {
+                override fun run() {
+                    applyStylesNow()
+                    main.postDelayed(this, 4000L)
+                }
+            }
+            main.postDelayed(restyle, 4000L)
+        }
         val beat = object : Runnable {
             override fun run() {
                 sendHeartbeatAsync()
+                if (!isSystemUi || !foundOnce) main.post { discover() }
                 h.postDelayed(this, 30000L)
             }
         }
@@ -110,13 +140,14 @@ object HookClient {
     }
 
     private fun buildExtras(): Bundle = Bundle().apply {
+        putString(HookStatus.K_PKG, pkg)
         putString(HookStatus.K_FRAMEWORK, frameworkInfo)
         putInt(HookStatus.K_API, apiVersion)
         putString(HookStatus.K_CLASS, hookedClass ?: "")
         putString(HookStatus.K_ERROR, hookError ?: "")
         putString(
             HookStatus.K_PROBE,
-            ("entered=$entered draws=$draws err=$errors cfg=${if (config != null) "ok" else "none"} " +
+            ("[$pkg] entered=$entered draws=$draws err=$errors cfg=${if (config != null) "ok" else "none"} " +
                 "${discovery ?: ""} ${viewInfo ?: ""}").trim().take(480),
         )
         putInt(HookStatus.K_DRAWS, entered)
@@ -134,6 +165,7 @@ object HookClient {
                 log(Log.INFO, "config loaded (attempt $attempt): identity=${cfg.isIdentity} enabled=${cfg.enabled} hook=${cfg.hookEnabled}")
             }
             invalidateAll()
+            main.post { applyStylesNow() }
         } catch (t: Throwable) {
             log(Log.WARN, "config load failed (attempt $attempt): ${t.javaClass.simpleName}: ${t.message}")
             if (attempt < 20) handler?.postDelayed({ load(attempt + 1) }, 3000L)
@@ -180,8 +212,17 @@ object HookClient {
         val sb = StringBuilder("roots=$roots found=${found.size}")
         for (v in found.take(3)) {
             views.add(v)
+            foundOnce = true
             val res = try {
-                hooker?.invoke(v.javaClass) ?: "no hooker"
+                if (isSystemUi) {
+                    hooker?.invoke(v.javaClass) ?: "no hooker"
+                } else {
+                    styled.add(v)
+                    ViewStyler.apply(v, config)
+                    hookedClass = v.javaClass.name
+                    hookError = null
+                    "styled; " + (suppressHooker?.invoke(v.javaClass) ?: "no suppress")
+                }
             } catch (t: Throwable) {
                 "hook failed: " + t.javaClass.simpleName
             }
