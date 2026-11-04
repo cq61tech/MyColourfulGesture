@@ -9,7 +9,7 @@ import java.util.WeakHashMap
 
 /**
  * Arka plan + çıkıntı (outline) ile çizilen pill'ler için (Launcher StashedHandleView).
- * Arka planı kendi çizimimizle değiştirir; genişlik/yükseklik ölçekle, konum ötelemeyle ayarlanır.
+ * Arka planı kendi çizimimizle değiştirir; ölçüler PillDrawable içinde stok pill'in outline'ından türetilir.
  * Ana iş parçacığında çağrılmalıdır.
  */
 object ViewStyler {
@@ -37,15 +37,12 @@ object ViewStyler {
             if (v.background !== d) v.background = d
             v.clipToOutline = false
 
-            val density = v.resources.displayMetrics.density
-            val sy = cfg.heightPct / 100f
-            v.pivotX = v.width / 2f
-            v.pivotY = v.height.toFloat()
-            v.scaleX = if (cfg.shape == PillConfig.SHAPE_BAR) cfg.widthPct / 100f else sy
-            v.scaleY = sy
-            v.translationY = s.ty - cfg.offsetDp * density
-            val parentW = (v.parent as? View)?.width ?: v.width
-            v.translationX = s.tx + (parentW - v.width) / 2f * cfg.hAlign / 100f
+            // Boyut ve konum artık Drawable içinde, stok pill'in outline'ına göre hesaplanır.
+            // View'ın kendi ölçek/öteleme değerleri orijinal haline döner (önceki sürümden kalmasın).
+            v.scaleX = s.sx
+            v.scaleY = s.sy
+            v.translationX = s.tx
+            v.translationY = s.ty
 
             HookClient.entered += 1
             v.invalidate()

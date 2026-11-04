@@ -2,18 +2,47 @@ package com.mycolourfulgesture.hook
 
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Outline
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import com.mycolourfulgesture.core.PillConfig
 import java.lang.ref.WeakReference
 
 /**
- * Pill view'ının arka planı olarak takılır. ColorDrawable'dan türer, böylece orijinal kod
- * arka planı ColorDrawable'a çevirip rengini animasyonlarsa çökme olmaz; stok renk de buradan okunur.
+ * Pill view'ının arka planı olarak takılır. ColorDrawable'dan türer: orijinal kod arka planı
+ * ColorDrawable'a çevirip rengini animasyonlarsa çökme olmaz, stok renk de buradan okunur.
+ *
+ * Launcher'da pill view'ı tüm navigasyon alanı kadardır; gerçek pill, view'ın outline'ında küçük bir
+ * yuvarlak dikdörtgendir. Ölçüleri o outline'dan (stok pill) alırız, böylece ayarlar stok boyuta göre uygulanır.
  */
 class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE) {
     @Volatile var cfg: PillConfig? = null
     private val ref = WeakReference(view)
+    private val outline = Outline()
+    private val tmp = Rect()
+    private val stockR = RectF()
+
+    /** Stok pill'in view içindeki dikdörtgenini bulur; outline okunamazsa Pixel varsayılanını kullanır. */
+    private fun readStock(view: View, w: Float, h: Float, d: Float) {
+        try {
+            val p = view.outlineProvider
+            if (p != null) {
+                outline.setEmpty()
+                p.getOutline(view, outline)
+                if (outline.getRect(tmp) && !tmp.isEmpty) {
+                    stockR.set(tmp)
+                    return
+                }
+            }
+        } catch (_: Throwable) {
+        }
+        val pw = minOf(108f * d, w)
+        val ph = 4f * d
+        val bottom = h - 8f * d
+        stockR.set((w - pw) / 2f, bottom - ph, (w + pw) / 2f, bottom)
+    }
 
     override fun draw(canvas: Canvas) {
         val c = cfg
@@ -27,15 +56,31 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
         val h = b.height().toFloat()
         if (w <= 0f || h <= 0f) return
         val d = view.resources.displayMetrics.density
-        val gap = h * 0.9f
+        readStock(view, w, h, d)
+
+        val pillH = (stockR.height() * c.heightPct / 100f).coerceIn(1f, h)
+        val gap = pillH * 0.9f
         val totalW = when (c.shape) {
-            PillConfig.SHAPE_DOT -> h
-            PillConfig.SHAPE_DOTS -> h * 3f + gap * 2f
-            else -> w
-        }.coerceAtMost(w)
-        val left = b.left + (w - totalW) / 2f
-        val corner = h / 2f * c.cornerPct / 100f
-        val animating = PillRenderer.render(canvas, view.context, c, left, b.top.toFloat(), totalW, h, gap, corner, d, color)
+            PillConfig.SHAPE_DOT -> pillH
+            PillConfig.SHAPE_DOTS -> pillH * 3f + gap * 2f
+            else -> stockR.width() * c.widthPct / 100f
+        }.coerceIn(1f, w)
+
+        // Yatay: stok pill'in ortasından başlar; hAlign ile view'ın sol/sağ kenarına doğru kayar.
+        val leftMax = w - totalW
+        val left0 = stockR.centerX() - totalW / 2f
+        val left = (
+            if (c.hAlign < 0) left0 + (0f - left0) * (-c.hAlign / 100f)
+            else left0 + (leftMax - left0) * (c.hAlign / 100f)
+        ).coerceIn(0f, leftMax)
+
+        val bottom = (stockR.bottom - c.offsetDp * d).coerceIn(pillH, h)
+        val top = bottom - pillH
+        val corner = pillH / 2f * c.cornerPct / 100f
+
+        val animating = PillRenderer.render(
+            canvas, view.context, c, b.left + left, b.top + top, totalW, pillH, gap, corner, d, color,
+        )
         if (animating) view.postInvalidateDelayed(40L)
     }
 }
