@@ -51,6 +51,7 @@ class AppSettings(context: Context) {
     val dockText = IntPref(sp, "dock_text", 12)
     val dockLabels = BoolPref(sp, "dock_labels", true)
     val dockBottom = IntPref(sp, "dock_bottom", 12)
+    val dockAutoHide = BoolPref(sp, "dock_autohide", true)
 
     fun bumpResume() {
         resumeTick++
@@ -66,7 +67,7 @@ class AppSettings(context: Context) {
         updateThemeMode(THEME_SYSTEM)
         dynamicColor.reset(); seedHue.reset(); amoled.reset()
         dockFloating.reset(); dockWidth.reset(); dockHeight.reset()
-        dockOpacity.reset(); dockText.reset(); dockLabels.reset(); dockBottom.reset()
+        dockOpacity.reset(); dockText.reset(); dockLabels.reset(); dockBottom.reset(); dockAutoHide.reset()
     }
 
     companion object {

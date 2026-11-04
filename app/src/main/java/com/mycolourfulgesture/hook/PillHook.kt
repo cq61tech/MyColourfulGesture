@@ -32,6 +32,8 @@ class PillHook : XposedModule() {
         HookClient.apiVersion = apiVersion
         HookClient.logger = { priority, msg -> log(priority, TAG, msg) }
 
+        HookClient.startEarly()
+
         var lastError: String? = null
         for (name in HANDLE_CLASSES) {
             try {

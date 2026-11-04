@@ -37,6 +37,7 @@ class ConfigProvider : ContentProvider() {
             .putString(HookStatus.K_CLASS, extras?.getString(HookStatus.K_CLASS) ?: "")
             .putString(HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
             .putString(HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
+            .putInt(HookStatus.K_DRAWS, extras?.getInt(HookStatus.K_DRAWS) ?: 0)
             .apply()
     }
 

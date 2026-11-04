@@ -22,7 +22,8 @@ object HookClient {
     @Volatile var apiVersion: Int = 0
     @Volatile var hookedClass: String? = null
     @Volatile var hookError: String? = null
-    @Volatile var probe: String? = null
+    @Volatile var viewInfo: String? = null
+    @Volatile var draws: Int = 0
     @Volatile var logger: ((Int, String) -> Unit)? = null
 
     private val views: MutableSet<View> =
@@ -43,9 +44,34 @@ object HookClient {
 
     fun attach(view: View) {
         views.add(view)
-        if (started.compareAndSet(false, true)) {
-            start(view.context.applicationContext ?: view.context)
+        ensureStarted(view.context.applicationContext ?: view.context)
+    }
+
+    private fun ensureStarted(ctx: Context) {
+        if (started.compareAndSet(false, true)) start(ctx)
+    }
+
+    /** Çizim beklemeden başlar: uygulama bağlamı hazır olana kadar saniyede bir dener. */
+    fun startEarly() {
+        val h = Handler(Looper.getMainLooper())
+        var tries = 0
+        val poll = object : Runnable {
+            override fun run() {
+                val app = try {
+                    Class.forName("android.app.ActivityThread").getMethod("currentApplication").invoke(null) as? Context
+                } catch (_: Throwable) {
+                    null
+                }
+                if (app != null) {
+                    ensureStarted(app)
+                } else if (++tries < 90) {
+                    h.postDelayed(this, 1000L)
+                } else {
+                    log(Log.WARN, "no application context after 90s")
+                }
+            }
         }
+        h.post(poll)
     }
 
     private fun start(ctx: Context) {
@@ -65,6 +91,13 @@ object HookClient {
             log(Log.WARN, "observer register failed: ${t.javaClass.simpleName}")
         }
         h.post { load(0) }
+        val beat = object : Runnable {
+            override fun run() {
+                sendHeartbeatAsync()
+                h.postDelayed(this, 30000L)
+            }
+        }
+        h.postDelayed(beat, 30000L)
     }
 
     private fun buildExtras(): Bundle = Bundle().apply {
@@ -72,7 +105,11 @@ object HookClient {
         putInt(HookStatus.K_API, apiVersion)
         putString(HookStatus.K_CLASS, hookedClass ?: "")
         putString(HookStatus.K_ERROR, hookError ?: "")
-        putString(HookStatus.K_PROBE, probe ?: "")
+        putString(
+            HookStatus.K_PROBE,
+            "draws=$draws cfg=${if (config != null) "ok" else "none"} ${viewInfo ?: ""}".trim(),
+        )
+        putInt(HookStatus.K_DRAWS, draws)
     }
 
     /** "get" çağrısı hem ayarı getirir hem de durumu (heartbeat) uygulamaya yazar. */

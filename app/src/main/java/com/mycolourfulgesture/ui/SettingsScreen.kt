@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import com.mycolourfulgesture.AppSettings
@@ -49,7 +52,7 @@ private fun currentLanguage(): String {
 }
 
 @Composable
-fun SettingsScreen(settings: AppSettings, pill: PillState) {
+fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0.dp) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     var lang by remember { mutableStateOf(currentLanguage()) }
@@ -159,6 +162,11 @@ fun SettingsScreen(settings: AppSettings, pill: PillState) {
                 IntSlider(stringResource(R.string.set_dock_text), " sp", settings.dockText.value, 9..16, { settings.dockText.set(it) })
                 IntSlider(stringResource(R.string.set_dock_bottom), " dp", settings.dockBottom.value, 0..48, { settings.dockBottom.set(it) })
                 SwitchRow(
+                    title = stringResource(R.string.set_dock_autohide),
+                    desc = stringResource(R.string.set_dock_autohide_desc),
+                    checked = settings.dockAutoHide.value,
+                ) { settings.dockAutoHide.set(it) }
+                SwitchRow(
                     title = stringResource(R.string.set_dock_labels),
                     desc = null,
                     checked = settings.dockLabels.value,
@@ -197,7 +205,7 @@ fun SettingsScreen(settings: AppSettings, pill: PillState) {
                     PackageManager.DONT_KILL_APP,
                 )
             }
-            OutlinedButton(onClick = { restartSystemUi() }) {
+            OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { restartSystemUi(context) }) {
                 Text(stringResource(R.string.status_restart))
             }
         }
@@ -222,10 +230,10 @@ fun SettingsScreen(settings: AppSettings, pill: PillState) {
         Block {
             BlockTitle(stringResource(R.string.set_backup))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { exportLauncher.launch("MyColourfulGesture-backup.json") }) {
+                OutlinedButton(modifier = Modifier.weight(1f), onClick = { exportLauncher.launch("MyColourfulGesture-backup.json") }) {
                     Text(stringResource(R.string.set_export))
                 }
-                OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }) {
+                OutlinedButton(modifier = Modifier.weight(1f), onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }) {
                     Text(stringResource(R.string.set_import))
                 }
             }
@@ -253,14 +261,15 @@ fun SettingsScreen(settings: AppSettings, pill: PillState) {
             BlockTitle(stringResource(R.string.set_about))
             Text(stringResource(R.string.settings_license), style = MaterialTheme.typography.bodyMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { uriHandler.openUri(Constants.REPO_URL) }) {
+                OutlinedButton(modifier = Modifier.weight(1f), onClick = { uriHandler.openUri(Constants.REPO_URL) }) {
                     Text(stringResource(R.string.about_github))
                 }
-                OutlinedButton(onClick = { uriHandler.openUri(Constants.ISSUES_URL) }) {
+                OutlinedButton(modifier = Modifier.weight(1f), onClick = { uriHandler.openUri(Constants.ISSUES_URL) }) {
                     Text(stringResource(R.string.set_issues))
                 }
             }
         }
+        Spacer(Modifier.height(bottomPadding))
     }
 
     if (showResetDialog) {

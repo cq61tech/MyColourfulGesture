@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mycolourfulgesture.PillState
 import com.mycolourfulgesture.R
@@ -40,10 +42,27 @@ import com.mycolourfulgesture.core.PillConfig
 private data class Preset(val nameRes: Int, val cfg: PillConfig)
 
 private val PRESETS = listOf(
+    Preset(R.string.preset_pride, PillConfig(
+        gradient = 2, widthPct = 100, heightPct = 200, animMode = PillConfig.ANIM_FLOW, animSpeed = 70)),
+    Preset(R.string.preset_aurora, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00E5A8.toInt(), gradient = 1, color2 = 0xFF7C4DFF.toInt(),
+        widthPct = 85, heightPct = 150, animMode = PillConfig.ANIM_FLOW, animSpeed = 80)),
+    Preset(R.string.preset_lava, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF5722.toInt(), gradient = 1, color2 = 0xFFFFC107.toInt(),
+        heightPct = 160, animMode = PillConfig.ANIM_FLOW, animSpeed = 120)),
+    Preset(R.string.preset_candy, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF80AB.toInt(), gradient = 1, color2 = 0xFF82B1FF.toInt(),
+        widthPct = 70, heightPct = 130)),
+    Preset(R.string.preset_ocean, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00B0FF.toInt(), gradient = 1, color2 = 0xFF00E5FF.toInt(),
+        widthPct = 90, heightPct = 140, animMode = PillConfig.ANIM_BREATHE, animSpeed = 70)),
+    Preset(R.string.preset_glass, PillConfig(
+        colorMode = PillConfig.COLOR_CUSTOM, color = -1, alphaPct = 45, widthPct = 80, heightPct = 150,
+        strokeDp10 = 8, strokeColor = -1)),
     Preset(R.string.preset_neon, PillConfig(
         colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00E5FF.toInt(), heightPct = 150, animMode = PillConfig.ANIM_BREATHE)),
     Preset(R.string.preset_sunset, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF7A59.toInt(), gradient = true,
+        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF7A59.toInt(), gradient = 1,
         color2 = 0xFFB05CC4.toInt(), widthPct = 70, heightPct = 140)),
     Preset(R.string.preset_soft, PillConfig(
         colorMode = PillConfig.COLOR_MONET, monetSource = 1, monetShade = 4, alphaPct = 90, heightPct = 120)),
@@ -56,7 +75,7 @@ private val PRESETS = listOf(
 )
 
 @Composable
-fun CustomizationScreen(state: PillState) {
+fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
     val cfg = state.config
     val commit = { state.commit() }
 
@@ -174,15 +193,19 @@ fun CustomizationScreen(state: PillState) {
                 onFinished = commit,
             )
 
-            SwitchRow(
-                title = stringResource(R.string.cust_gradient),
-                desc = null,
-                checked = cfg.gradient,
+            Text(stringResource(R.string.cust_gradient), style = MaterialTheme.typography.bodyMedium)
+            Segments(
+                options = listOf(
+                    stringResource(R.string.gradient_off),
+                    stringResource(R.string.gradient_two),
+                    stringResource(R.string.gradient_rainbow),
+                ),
+                selected = cfg.gradient,
             ) {
                 state.update(state.config.copy(gradient = it))
                 commit()
             }
-            if (cfg.gradient) {
+            if (cfg.gradient == 1) {
                 Text(stringResource(R.string.cust_gradient_color), style = MaterialTheme.typography.bodyMedium)
                 ColorPicker(
                     color = cfg.color2,
@@ -308,6 +331,7 @@ fun CustomizationScreen(state: PillState) {
         OutlinedButton(onClick = { state.resetLook() }) {
             Text(stringResource(R.string.cust_reset))
         }
+        Spacer(Modifier.height(bottomPadding))
     }
 }
 
@@ -347,7 +371,9 @@ private fun PillPreview(cfg: PillConfig) {
             val top = bottom - pillH
             val corner = pillH / 2f * cfg.cornerPct / 100f
 
-            val brush: Brush = if (cfg.gradient) {
+            val brush: Brush = if (cfg.gradient == 2) {
+                Brush.horizontalGradient(PillConfig.RAINBOW.map { Color(it) }, startX = left, endX = left + totalW)
+            } else if (cfg.gradient == 1) {
                 Brush.horizontalGradient(listOf(c1, c2), startX = left, endX = left + totalW)
             } else {
                 SolidColor(c1)

@@ -1,5 +1,9 @@
 package com.mycolourfulgesture.ui
 
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -176,11 +180,17 @@ private fun hueOf(argb: Int): Float {
     return hsv[0]
 }
 
-internal fun restartSystemUi() {
+internal fun restartSystemUi(context: Context) {
+    val app = context.applicationContext
     Thread {
+        var ok = false
         try {
-            Runtime.getRuntime().exec(arrayOf("su", "-c", "killall com.android.systemui")).waitFor()
+            val cmd = "killall com.android.systemui || pkill -f com.android.systemui || am crash com.android.systemui"
+            ok = Runtime.getRuntime().exec(arrayOf("su", "-c", cmd)).waitFor() == 0
         } catch (_: Throwable) {
+        }
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(app, app.getString(if (ok) R.string.restart_ok else R.string.restart_fail), Toast.LENGTH_LONG).show()
         }
     }.start()
 }

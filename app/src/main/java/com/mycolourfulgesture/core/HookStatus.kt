@@ -10,6 +10,7 @@ data class HookStatus(
     val hookedClass: String?,
     val error: String?,
     val probe: String?,
+    val draws: Int,
 ) {
     /** SystemUI her açılışta heartbeat gönderir; son açılıştan önceki kayıt "aktif" sayılmaz. */
     val activeThisBoot: Boolean
@@ -25,6 +26,7 @@ data class HookStatus(
         const val K_CLASS = "class"
         const val K_ERROR = "error"
         const val K_PROBE = "probe"
+        const val K_DRAWS = "draws"
 
         fun read(context: Context): HookStatus {
             val sp = context.getSharedPreferences(ConfigContract.PREFS_STATUS, Context.MODE_PRIVATE)
@@ -35,6 +37,7 @@ data class HookStatus(
                 hookedClass = sp.getString(K_CLASS, null)?.takeIf { it.isNotEmpty() },
                 error = sp.getString(K_ERROR, null)?.takeIf { it.isNotEmpty() },
                 probe = sp.getString(K_PROBE, null)?.takeIf { it.isNotEmpty() },
+                draws = sp.getInt(K_DRAWS, 0),
             )
         }
     }

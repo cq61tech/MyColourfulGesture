@@ -27,7 +27,7 @@ data class PillConfig(
     val monetSource: Int = 1,
     val monetShade: Int = 5,
     val alphaPct: Int = 100,
-    val gradient: Boolean = false,
+    val gradient: Int = 0,
     val color2: Int = 0xFFB05CC4.toInt(),
     val animMode: Int = ANIM_NONE,
     val animSpeed: Int = 100,
@@ -41,7 +41,7 @@ data class PillConfig(
     val strokeColor: Int = -1,
 ) {
     val isIdentity: Boolean
-        get() = colorMode == COLOR_STOCK && alphaPct == 100 && !gradient && animMode == ANIM_NONE &&
+        get() = colorMode == COLOR_STOCK && alphaPct == 100 && gradient == 0 && animMode == ANIM_NONE &&
             shape == SHAPE_BAR && widthPct == 100 && heightPct == 100 && cornerPct == 100 &&
             offsetDp == 0 && hAlign == 0 && strokeDp10 == 0
 
@@ -49,7 +49,7 @@ data class PillConfig(
         "c_hook" to b(hookEnabled), "c_debug" to b(debug), "c_enabled" to b(enabled),
         "c_color_mode" to colorMode, "c_color" to color,
         "c_monet_src" to monetSource, "c_monet_shade" to monetShade,
-        "c_alpha" to alphaPct, "c_gradient" to b(gradient), "c_color2" to color2,
+        "c_alpha" to alphaPct, "c_gradient" to gradient, "c_color2" to color2,
         "c_anim" to animMode, "c_anim_speed" to animSpeed, "c_shape" to shape,
         "c_width" to widthPct, "c_height" to heightPct, "c_corner" to cornerPct,
         "c_offset" to offsetDp, "c_halign" to hAlign,
@@ -76,6 +76,10 @@ data class PillConfig(
         const val SHAPE_BAR = 0
         const val SHAPE_DOT = 1
         const val SHAPE_DOTS = 2
+        val RAINBOW = intArrayOf(
+            0xFFFF3B30.toInt(), 0xFFFF9500.toInt(), 0xFFFFCC00.toInt(),
+            0xFF34C759.toInt(), 0xFF007AFF.toInt(), 0xFFAF52DE.toInt(),
+        )
         val MONET_SHADES = intArrayOf(0, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
 
         private fun from(g: (String, Int) -> Int): PillConfig {
@@ -89,7 +93,7 @@ data class PillConfig(
                 monetSource = g("c_monet_src", d.monetSource).coerceIn(1, 5),
                 monetShade = g("c_monet_shade", d.monetShade).coerceIn(0, MONET_SHADES.size - 1),
                 alphaPct = g("c_alpha", d.alphaPct).coerceIn(0, 100),
-                gradient = g("c_gradient", 0) == 1,
+                gradient = g("c_gradient", 0).coerceIn(0, 2),
                 color2 = g("c_color2", d.color2),
                 animMode = g("c_anim", d.animMode).coerceIn(0, 2),
                 animSpeed = g("c_anim_speed", d.animSpeed).coerceIn(30, 300),

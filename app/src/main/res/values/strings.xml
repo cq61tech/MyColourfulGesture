@@ -163,4 +163,18 @@
     <string name="upd_error">Could not check (%1$s)</string>
     <string name="set_about">About</string>
     <string name="set_issues">Report an issue</string>
+    <string name="preset_pride">Pride</string>
+    <string name="preset_aurora">Aurora</string>
+    <string name="preset_lava">Lava</string>
+    <string name="preset_candy">Candy</string>
+    <string name="preset_ocean">Ocean</string>
+    <string name="preset_glass">Glass</string>
+    <string name="gradient_off">Solid</string>
+    <string name="gradient_two">2 colors</string>
+    <string name="gradient_rainbow">Rainbow</string>
+    <string name="set_dock_autohide">Hide when scrolling</string>
+    <string name="set_dock_autohide_desc">Slides away as you scroll down, returns as you scroll up</string>
+    <string name="restart_ok">System UI restart requested</string>
+    <string name="restart_fail">Root command failed. Allow root for this app in Magisk or KernelSU, or restart System UI manually.</string>
+    <string name="status_no_draw">Hook is installed, but the pill class has not drawn yet. Lock and unlock once. If this never changes, your ROM draws the pill with a different class.</string>
 </resources>

@@ -163,4 +163,18 @@
     <string name="upd_error">Denetlenemedi (%1$s)</string>
     <string name="set_about">Hakkında</string>
     <string name="set_issues">Sorun bildir</string>
+    <string name="preset_pride">Pride</string>
+    <string name="preset_aurora">Aurora</string>
+    <string name="preset_lava">Lav</string>
+    <string name="preset_candy">Şeker</string>
+    <string name="preset_ocean">Okyanus</string>
+    <string name="preset_glass">Cam</string>
+    <string name="gradient_off">Düz</string>
+    <string name="gradient_two">2 renk</string>
+    <string name="gradient_rainbow">Gökkuşağı</string>
+    <string name="set_dock_autohide">Kaydırırken gizle</string>
+    <string name="set_dock_autohide_desc">Aşağı kaydırınca gizlenir, yukarı kaydırınca geri gelir</string>
+    <string name="restart_ok">Sistem Arayüzü yeniden başlatılıyor</string>
+    <string name="restart_fail">Root komutu başarısız. Magisk veya KernelSU’da bu uygulamaya root izni ver ya da Sistem Arayüzü’nü elle yeniden başlat.</string>
+    <string name="status_no_draw">Hook kurulu ama pill sınıfı henüz çizim yapmadı. Bir kez kilitle ve aç. Hiç değişmezse ROM’un pill’i farklı bir sınıfla çiziyordur.</string>
 </resources>

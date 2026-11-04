@@ -26,7 +26,6 @@ object PillDrawer {
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val matrix = Matrix()
     private val fieldCache = HashMap<String, Field?>()
-    private var probed = false
     private var monetKey = -1
     private var monetAt = 0L
     private var monetColor = Color.WHITE
@@ -37,6 +36,13 @@ object PillDrawer {
         if (view == null || canvas == null) return chain.proceed()
 
         HookClient.attach(view)
+        HookClient.draws += 1
+        if (HookClient.draws == 1) {
+            HookClient.viewInfo = "${view.javaClass.simpleName} ${view.width}x${view.height} " +
+                "r=${readFloat(view, "mRadius")} b=${readFloat(view, "mBottom")}"
+            HookClient.log(Log.INFO, "first draw: ${HookClient.viewInfo}")
+            HookClient.sendHeartbeatAsync()
+        }
         val cfg = HookClient.config
         if (cfg == null || !cfg.hookEnabled || !cfg.enabled || cfg.isIdentity) return chain.proceed()
 
@@ -60,12 +66,6 @@ object PillDrawer {
         val radius0 = readFloat(view, "mRadius")
         val bottom0 = readFloat(view, "mBottom")
         val stockColor = readPaintColor(view)
-        if (!probed) {
-            probed = true
-            HookClient.probe = "mRadius=$radius0 mBottom=$bottom0 paint=${stockColor != null} view=${w.toInt()}x${h.toInt()}"
-            HookClient.log(Log.INFO, "probe: ${HookClient.probe}")
-            HookClient.sendHeartbeatAsync()
-        }
 
         val baseHeight = (radius0 ?: (2f * d)) * 2f
         val bottomMargin = bottom0 ?: (8f * d)
@@ -100,8 +100,12 @@ object PillDrawer {
             alphaF *= 0.55f + 0.45f * (0.5f + 0.5f * sin(2.0 * PI * phase).toFloat())
         }
 
-        if (cfg.gradient) {
-            val sh = LinearGradient(left, 0f, left + totalW, 0f, c1, cfg.color2, Shader.TileMode.MIRROR)
+        if (cfg.gradient != 0) {
+            val sh = if (cfg.gradient == 2) {
+                LinearGradient(left, 0f, left + totalW, 0f, PillConfig.RAINBOW, null, Shader.TileMode.MIRROR)
+            } else {
+                LinearGradient(left, 0f, left + totalW, 0f, c1, cfg.color2, Shader.TileMode.MIRROR)
+            }
             if (cfg.animMode == PillConfig.ANIM_FLOW) {
                 val period = (3000f / speed).toLong().coerceAtLeast(400L)
                 matrix.setTranslate((now % period).toFloat() / period * totalW * 2f, 0f)
