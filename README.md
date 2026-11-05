@@ -17,6 +17,10 @@ Color (stock / custom / Monet), gradient and rainbow, bar / dot / dots, width, h
 
 On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
 
+## Languages
+
+English, Turkish, Russian, Spanish, German, French. To add one, copy `app/src/main/res/values/strings.xml` to `values-xx/strings.xml`, translate it, add the code to `res/xml/locales_config.xml` and to the `LANGUAGES` list in `SettingsScreen.kt`, then open a pull request.
+
 ## Build
 
 Every push to `main` builds a debug APK through GitHub Actions and attaches it to a pre-release.

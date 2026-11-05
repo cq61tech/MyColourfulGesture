@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -43,7 +45,10 @@ import com.mycolourfulgesture.R
 import com.mycolourfulgesture.core.HookStatus
 import com.mycolourfulgesture.core.PillConfig
 
-private val LANGUAGES = listOf("en" to "English", "tr" to "Türkçe")
+private val LANGUAGES = listOf(
+    "en" to "English", "tr" to "Türkçe", "ru" to "Русский",
+    "es" to "Español", "de" to "Deutsch", "fr" to "Français",
+)
 private const val LAUNCHER_ALIAS = "com.mycolourfulgesture.LauncherAlias"
 
 private fun currentLanguage(): String {
@@ -102,13 +107,20 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
     ) {
         Block {
             BlockTitle(stringResource(R.string.settings_language))
-            Segments(
-                options = LANGUAGES.map { it.second },
-                selected = LANGUAGES.indexOfFirst { it.first == lang }.coerceAtLeast(0),
-            ) { index ->
-                val tag = LANGUAGES[index].first
-                lang = tag
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                LANGUAGES.forEach { (tag, name) ->
+                    FilterChip(
+                        selected = lang == tag,
+                        onClick = {
+                            lang = tag
+                            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+                        },
+                        label = { Text(name) },
+                    )
+                }
             }
         }
 
