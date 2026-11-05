@@ -14,7 +14,6 @@ import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.sin
 
-/** Renk, gradient, animasyon, şekil ve kenar çizgisini çizer. Hem onDraw hem Drawable yolu bunu kullanır. */
 object PillRenderer {
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
@@ -23,7 +22,7 @@ object PillRenderer {
     private var monetAt = 0L
     private var monetColor = Color.WHITE
 
-    /** Yeni kare gerekiyorsa (animasyon) true döner. */
+    
     fun render(
         canvas: Canvas, ctx: Context, cfg: PillConfig,
         left: Float, top: Float, totalW: Float, pillH: Float, gap: Float, corner: Float,
@@ -45,16 +44,14 @@ object PillRenderer {
         }
 
         if (cfg.gradient != 0) {
-            val sh = if (cfg.gradient == 2) {
-                LinearGradient(left, 0f, left + totalW, 0f, PillConfig.RAINBOW, null, Shader.TileMode.MIRROR)
-            } else {
-                LinearGradient(left, 0f, left + totalW, 0f, c1, cfg.color2, Shader.TileMode.MIRROR)
-            }
+            val sh = gradient(cfg.gradient, c1, cfg.color2, left, totalW)
+            var shift = 0f
             if (cfg.animMode == PillConfig.ANIM_FLOW) {
                 val period = (3000f / speed).toLong().coerceAtLeast(400L)
-                matrix.setTranslate((now % period).toFloat() / period * totalW * 2f, 0f)
-                sh.setLocalMatrix(matrix)
+                shift = (now % period).toFloat() / period * totalW * 2f
             }
+            matrix.setTranslate(shift, 0f)
+            sh.setLocalMatrix(matrix)
             fill.shader = sh
         } else {
             fill.shader = null
@@ -71,6 +68,25 @@ object PillRenderer {
             drawShape(canvas, stroke, left, top, totalW, pillH, gap, corner, cfg.shape, sw)
         }
         return cfg.animMode != PillConfig.ANIM_NONE
+    }
+
+    private var cached: LinearGradient? = null
+    private var cMode = -1
+    private var cC1 = 0
+    private var cC2 = 0
+    private var cLeft = 0f
+    private var cWidth = 0f
+
+    private fun gradient(mode: Int, c1: Int, c2: Int, left: Float, width: Float): LinearGradient {
+        val g = cached
+        if (g != null && cMode == mode && cC1 == c1 && cC2 == c2 && cLeft == left && cWidth == width) return g
+        val n = if (mode == 2) {
+            LinearGradient(left, 0f, left + width, 0f, PillConfig.RAINBOW, null, Shader.TileMode.MIRROR)
+        } else {
+            LinearGradient(left, 0f, left + width, 0f, c1, c2, Shader.TileMode.MIRROR)
+        }
+        cached = n; cMode = mode; cC1 = c1; cC2 = c2; cLeft = left; cWidth = width
+        return n
     }
 
     private fun drawShape(

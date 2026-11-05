@@ -41,7 +41,6 @@ fun MyColourfulGestureTheme(
 private fun hsv(h: Float, s: Float, v: Float): Color =
     Color.hsv(((h % 360f) + 360f) % 360f, s.coerceIn(0f, 1f), v.coerceIn(0f, 1f))
 
-/** Tek bir tondan (hue) yaklaşık bir Material renk şeması üretir. */
 private fun seedScheme(h: Float, dark: Boolean): ColorScheme =
     if (dark) {
         darkColorScheme(

@@ -72,7 +72,7 @@ fun AppRoot(settings: AppSettings, pill: PillState) {
 
     LaunchedEffect(tab, floating) { dockVisible = true }
 
-    // Aşağı kaydırınca dock gizlenir, yukarı kaydırınca geri gelir.
+    // aşağı kaydırınca dock gizlenir, yukarı kaydırınca döner
     val connection = remember(autoHide) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -101,7 +101,6 @@ fun AppRoot(settings: AppSettings, pill: PillState) {
             }
         },
     ) { inner ->
-        // Yüzen dock modunda içerik ekranın en altına kadar uzanır; dock onun üstünde yüzer.
         val bottomPad = if (floating) 0.dp else inner.calculateBottomPadding()
         val tail = if (floating) navBottom + (settings.dockHeight.value + settings.dockBottom.value + 16).dp else 0.dp
 

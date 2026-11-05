@@ -44,18 +44,8 @@
     <string name="about_github">GitHub repository</string>
 
     <string name="cust_preview">Live preview</string>
-    <string name="cust_coming">Coming soon. These groups will control the pill once the hook is ready.</string>
-    <string name="cust_color">Color and Monet</string>
-    <string name="cust_color_desc">Fixed color, dynamic palette, transparency, gradient</string>
-    <string name="cust_size">Size and shape</string>
-    <string name="cust_size_desc">Width, height, corners, stroke, alternative forms</string>
-    <string name="cust_position">Position and behavior</string>
-    <string name="cust_position_desc">Vertical offset, alignment, animation speed</string>
-    <string name="cust_context">Contextual styles</string>
-    <string name="cust_context_desc">Keyboard, landscape, low battery, charging</string>
 
     <string name="settings_language">Language</string>
-    <string name="settings_theme">Theme</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -71,7 +61,6 @@
     <string name="cust_enable">Customize the pill</string>
     <string name="cust_enable_desc">Turn off to get the stock pill back instantly</string>
     <string name="cust_color_section">Color</string>
-    <string name="cust_use_custom">Use a custom color</string>
     <string name="cust_hue">Hue</string>
     <string name="cust_opacity">Opacity</string>
     <string name="cust_size_section">Size and shape</string>

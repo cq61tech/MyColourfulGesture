@@ -12,7 +12,7 @@ data class HookStatus(
     val probe: String?,
     val draws: Int,
 ) {
-    /** SystemUI her açılışta heartbeat gönderir; son açılıştan önceki kayıt "aktif" sayılmaz. */
+    
     val activeThisBoot: Boolean
         get() {
             val bootTime = System.currentTimeMillis() - SystemClock.elapsedRealtime()
@@ -41,7 +41,7 @@ data class HookStatus(
 
         fun slotPrefix(pkg: String?) = if (pkg == "com.android.systemui") "s_" else "l_"
 
-        /** SystemUI ve başlatıcı kayıtlarından işe yarayanı (pill'e dokunan) ya da en yenisini döndürür. */
+        
         fun read(context: Context): HookStatus {
             val sp = context.getSharedPreferences(ConfigContract.PREFS_STATUS, Context.MODE_PRIVATE)
             val a = slot(sp, "s_")

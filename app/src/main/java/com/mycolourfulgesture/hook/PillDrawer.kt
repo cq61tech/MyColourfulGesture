@@ -8,10 +8,6 @@ import com.mycolourfulgesture.core.PillConfig
 import io.github.libxposed.api.XposedInterface
 import java.lang.reflect.Field
 
-/**
- * onDraw ile çizilen pill'ler için (SystemUI NavigationHandle). Hata olursa veya ayar "stok" ise orijinal çizime düşer.
- * Stok çizim: pill = view genişliğinde, yüksekliği 2*mRadius, alt kenarı (yükseklik - mBottom).
- */
 object PillDrawer {
     private val fieldCache = HashMap<String, Field?>()
 

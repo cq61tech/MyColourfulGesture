@@ -17,7 +17,6 @@ object ConfigContract {
 
 private fun b(v: Boolean) = if (v) 1 else 0
 
-/** Hem uygulama hem SystemUI hook'u kullanır. Varsayılanlar = stok pill (isIdentity). */
 data class PillConfig(
     val hookEnabled: Boolean = true,
     val debug: Boolean = false,
@@ -122,7 +121,6 @@ data class PillConfig(
     }
 }
 
-/** Monet (sistem paleti) renklerini çözer. Hem uygulama hem SystemUI tarafında kullanılır. */
 object MonetColors {
     private val PREFIX = arrayOf("", "system_accent1", "system_accent2", "system_accent3", "system_neutral1", "system_neutral2")
 

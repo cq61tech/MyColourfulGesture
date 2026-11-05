@@ -61,7 +61,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
 
     fun toast(res: Int) = Toast.makeText(context, context.getString(res), Toast.LENGTH_SHORT).show()
 
-    // ---------- yedekle / geri yükle ----------
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) {
             val ok = runCatching {
@@ -85,7 +84,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
         }
     }
 
-    // ---------- simge gizleme ----------
     val alias = remember { ComponentName(context.packageName, LAUNCHER_ALIAS) }
     var iconHidden by remember {
         mutableStateOf(
@@ -102,7 +100,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // ---------- Dil ----------
         Block {
             BlockTitle(stringResource(R.string.settings_language))
             Segments(
@@ -115,7 +112,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Görünüm ----------
         Block {
             BlockTitle(stringResource(R.string.set_appearance))
             Segments(
@@ -147,7 +143,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             ) { settings.amoled.set(it) }
         }
 
-        // ---------- Alt panel / Floating Dock ----------
         Block {
             BlockTitle(stringResource(R.string.set_dock))
             SwitchRow(
@@ -174,7 +169,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Modül ve hook'lar ----------
         Block {
             BlockTitle(stringResource(R.string.set_module))
             SwitchRow(
@@ -210,7 +204,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Teşhis / uyumluluk ----------
         Block {
             BlockTitle(stringResource(R.string.set_diag))
             val none = stringResource(R.string.set_diag_none)
@@ -226,7 +219,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Yedekle / geri yükle ----------
         Block {
             BlockTitle(stringResource(R.string.set_backup))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -239,7 +231,6 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Sıfırla ----------
         Block {
             BlockTitle(stringResource(R.string.set_reset))
             OutlinedButton(onClick = { pill.resetLook() }) {
@@ -250,13 +241,11 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             }
         }
 
-        // ---------- Güncellemeler ----------
         Block {
             BlockTitle(stringResource(R.string.set_updates))
             UpdateRow()
         }
 
-        // ---------- Hakkında ----------
         Block {
             BlockTitle(stringResource(R.string.set_about))
             Text(stringResource(R.string.settings_license), style = MaterialTheme.typography.bodyMedium)

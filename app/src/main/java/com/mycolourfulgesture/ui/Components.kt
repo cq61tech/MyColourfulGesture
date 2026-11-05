@@ -137,7 +137,6 @@ internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> U
     }
 }
 
-/** Hazır renkler + ton kaydırıcısı. onChange canlı, onCommit bırakınca çağrılır. */
 @Composable
 internal fun ColorPicker(color: Int, onChange: (Int) -> Unit, onCommit: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -182,13 +181,13 @@ private fun hueOf(argb: Int): Float {
 
 internal fun restartSystemUi(context: Context) = restartProcess(context, "com.android.systemui")
 
-/** Başlatıcıyı / SystemUI'yi root ile yeniden başlatır; sonucu bildirim olarak gösterir. */
 internal fun restartProcess(context: Context, pkg: String) {
     val app = context.applicationContext
     Thread {
         var ok = false
         try {
             val last = if (pkg == "com.android.systemui") "am crash $pkg" else "am force-stop $pkg"
+            // bazı ROM'larda killall yok, sırayla dene
             val cmd = "killall $pkg || pkill -f $pkg || $last"
             ok = Runtime.getRuntime().exec(arrayOf("su", "-c", cmd)).waitFor() == 0
         } catch (_: Throwable) {
@@ -199,7 +198,6 @@ internal fun restartProcess(context: Context, pkg: String) {
     }.start()
 }
 
-/** Varsayılan ana ekran (başlatıcı) uygulamasının paket adı. */
 internal fun defaultHomePackage(context: Context): String? = try {
     val intent = android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_HOME)
     context.packageManager.resolveActivity(intent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName

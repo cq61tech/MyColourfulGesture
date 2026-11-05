@@ -7,11 +7,6 @@ import android.view.View
 import com.mycolourfulgesture.core.PillConfig
 import java.util.WeakHashMap
 
-/**
- * Arka plan + çıkıntı (outline) ile çizilen pill'ler için (Launcher StashedHandleView).
- * Arka planı kendi çizimimizle değiştirir; ölçüler PillDrawable içinde stok pill'in outline'ından türetilir.
- * Ana iş parçacığında çağrılmalıdır.
- */
 object ViewStyler {
     private class Saved(
         val bg: Drawable?, val clip: Boolean,
@@ -29,6 +24,8 @@ object ViewStyler {
                 restore(v)
                 return
             }
+            val existing = drawables[v]
+            if (existing != null && existing.cfg === cfg && v.background === existing) return
             val s = saved.getOrPut(v) {
                 Saved(v.background, v.clipToOutline, v.scaleX, v.scaleY, v.translationX, v.translationY)
             }
@@ -37,8 +34,6 @@ object ViewStyler {
             if (v.background !== d) v.background = d
             v.clipToOutline = false
 
-            // Boyut ve konum artık Drawable içinde, stok pill'in outline'ına göre hesaplanır.
-            // View'ın kendi ölçek/öteleme değerleri orijinal haline döner (önceki sürümden kalmasın).
             v.scaleX = s.sx
             v.scaleY = s.sy
             v.translationX = s.tx

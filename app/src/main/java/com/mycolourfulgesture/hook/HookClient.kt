@@ -17,7 +17,6 @@ import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
-/** SystemUI sürecinde çalışır: ayarları modül uygulamasından alır, değişince view'ları yeniler. */
 object HookClient {
     @Volatile var config: PillConfig? = null
     @Volatile var frameworkInfo: String = ""
@@ -51,10 +50,11 @@ object HookClient {
 
     fun isStyled(v: Any?): Boolean = v is View && styled.contains(v)
 
-    /** Launcher modunda: bulunan pill view'larına güncel ayarı uygular (ana iş parçacığı). */
+    
     private fun applyStylesNow() {
         val cfg = config
         val snap = synchronized(styled) { styled.toList() }
+        if (snap.isEmpty()) return
         snap.forEach { ViewStyler.apply(it, cfg) }
     }
 
@@ -77,7 +77,7 @@ object HookClient {
         }
     }
 
-    /** Çizim beklemeden başlar: uygulama bağlamı hazır olana kadar saniyede bir dener. */
+    
     fun startEarly() {
         val h = Handler(Looper.getMainLooper())
         var tries = 0
@@ -120,7 +120,6 @@ object HookClient {
         log(Log.INFO, "device: ${Build.MANUFACTURER} ${Build.MODEL} / Android ${Build.VERSION.RELEASE} / ${Build.FINGERPRINT}")
         longArrayOf(4000L, 10000L, 20000L, 40000L, 70000L).forEach { d -> main.postDelayed({ discover() }, d) }
         if (!isSystemUi) {
-            // Launcher modunda arka plan değiştirilirse (ör. renk animasyonu) stili yeniden uygula.
             val restyle = object : Runnable {
                 override fun run() {
                     applyStylesNow()
@@ -132,11 +131,11 @@ object HookClient {
         val beat = object : Runnable {
             override fun run() {
                 sendHeartbeatAsync()
-                if (!isSystemUi || !foundOnce) main.post { discover() }
-                h.postDelayed(this, 30000L)
+                if (!foundOnce || (!isSystemUi && styled.isEmpty())) main.post { discover() }
+                h.postDelayed(this, 60000L)
             }
         }
-        h.postDelayed(beat, 30000L)
+        h.postDelayed(beat, 60000L)
     }
 
     private fun buildExtras(): Bundle = Bundle().apply {
@@ -153,7 +152,7 @@ object HookClient {
         putInt(HookStatus.K_DRAWS, entered)
     }
 
-    /** "get" çağrısı hem ayarı getirir hem de durumu (heartbeat) uygulamaya yazar. */
+    
     private fun load(attempt: Int) {
         val ctx = appContext ?: return
         try {
@@ -183,10 +182,8 @@ object HookClient {
         }
     }
 
-    /**
-     * SystemUI pencerelerini tarar, pill view'ını (NavigationHandle / home_handle) bulur,
-     * sınıfının çizim metodunu yakalar ve ne bulduğunu günlüğe yazar.
-     */
+    
+    // pencere ağacında pill view'ını bulur ve ilk bulunanı stillendirir
     private fun discover() {
         val found = ArrayList<View>()
         val names = LinkedHashSet<String>()

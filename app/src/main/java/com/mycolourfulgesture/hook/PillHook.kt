@@ -16,7 +16,7 @@ class PillHook : XposedModule() {
         }
     }
 
-    /** Uygulamanın kendi sürecinde: "LSPosed modülü yüklendi" bilgisini veren iki fonksiyonu değiştirir. */
+    
     private fun hookSelf(param: XposedModuleInterface.PackageReadyParam) {
         try {
             val c = param.classLoader.loadClass("com.mycolourfulgesture.core.ModuleStatus")
@@ -30,10 +30,7 @@ class PillHook : XposedModule() {
 
     private val hookedKeys = HashSet<String>()
 
-    /**
-     * Başlatıcı (Pixel Launcher / Launcher3 / Trebuchet) gibi kapsama eklenen diğer uygulamalar:
-     * pill'i görünüm ağacında arar, bulunca arka planını değiştirir.
-     */
+    
     private fun hookLauncher(param: XposedModuleInterface.PackageReadyParam) {
         HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
         HookClient.apiVersion = apiVersion
@@ -43,7 +40,7 @@ class PillHook : XposedModule() {
         HookClient.startEarly()
     }
 
-    /** Stilli view'ın orijinal onDraw'unu bastırır (aynı pill'in iki kez çizilmesini önler). */
+    
     private fun hookSuppress(cls: Class<*>): String {
         var k: Class<*>? = cls
         while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
@@ -68,7 +65,7 @@ class PillHook : XposedModule() {
         return "no onDraw"
     }
 
-    /** Her yakalanan çizim metodunun ortak girişi: hata olursa stok çizime düşer. */
+    
     private fun guarded(chain: XposedInterface.Chain): Any? {
         HookClient.entered += 1
         return try {
@@ -80,7 +77,7 @@ class PillHook : XposedModule() {
         }
     }
 
-    /** Bulunan view'ın sınıf zincirinde (android.* hariç) ilk onDraw / draw / dispatchDraw'ı yakalar. */
+    
     private fun hookDrawOf(cls: Class<*>): String {
         var k: Class<*>? = cls
         while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
@@ -121,7 +118,6 @@ class PillHook : XposedModule() {
                 log(Log.INFO, TAG, "Hooked $name.onDraw")
                 return
             } catch (_: ClassNotFoundException) {
-                // Bu Android sürümünde sınıf farklı pakette olabilir, sıradakini dene.
             } catch (t: Throwable) {
                 lastError = name.substringAfterLast('.') + ": " + t.javaClass.simpleName
                 log(Log.ERROR, TAG, "Hook failed for $name", t)

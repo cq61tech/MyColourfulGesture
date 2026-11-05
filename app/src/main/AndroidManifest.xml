@@ -23,7 +23,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-            <!-- LSPosed / Vector yöneticisinden "ayarlar" açılabilsin (simge gizliyken de) -->
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
             </intent-filter>
@@ -33,7 +32,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Başlatıcı simgesi bu alias'tan gelir; ayarlardan devre dışı bırakılarak gizlenir -->
         <activity-alias
             android:name=".LauncherAlias"
             android:enabled="true"

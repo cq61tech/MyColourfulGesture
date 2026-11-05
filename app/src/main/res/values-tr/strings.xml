@@ -44,18 +44,8 @@
     <string name="about_github">GitHub deposu</string>
 
     <string name="cust_preview">Canlı önizleme</string>
-    <string name="cust_coming">Yakında. Hook hazır olduğunda bu gruplar pill’i kontrol edecek.</string>
-    <string name="cust_color">Renk ve Monet</string>
-    <string name="cust_color_desc">Sabit renk, dinamik palet, şeffaflık, gradient</string>
-    <string name="cust_size">Boyut ve şekil</string>
-    <string name="cust_size_desc">Genişlik, yükseklik, köşeler, çizgi, alternatif formlar</string>
-    <string name="cust_position">Konum ve davranış</string>
-    <string name="cust_position_desc">Dikey ofset, hizalama, animasyon hızı</string>
-    <string name="cust_context">Bağlamsal stiller</string>
-    <string name="cust_context_desc">Klavye, yatay mod, düşük pil, şarj</string>
 
     <string name="settings_language">Dil</string>
-    <string name="settings_theme">Tema</string>
     <string name="settings_theme_system">Sistem</string>
     <string name="settings_theme_light">Açık</string>
     <string name="settings_theme_dark">Koyu</string>
@@ -71,7 +61,6 @@
     <string name="cust_enable">Pill’i özelleştir</string>
     <string name="cust_enable_desc">Kapatınca stok pill anında geri gelir</string>
     <string name="cust_color_section">Renk</string>
-    <string name="cust_use_custom">Özel renk kullan</string>
     <string name="cust_hue">Ton</string>
     <string name="cust_opacity">Opaklık</string>
     <string name="cust_size_section">Boyut ve şekil</string>

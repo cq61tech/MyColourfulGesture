@@ -1,54 +1,30 @@
 # MyColourfulGesture
 
-**Your imagination can completely transform one tiny line.**
+LSPosed module that restyles the gesture pill on Pixel and AOSP-based ROMs (Android 12-17), with a small companion app.
 
-An LSPosed module that customizes the Gesture Navigation Pill on Pixel and AOSP-based Android 12–17, with a Material 3 Expressive companion app.
-
-> **Status: Stage 3.** Gesture pill: stock/custom/Monet color, gradient, breathing / flowing animation, bar / dot / dots shapes, size, position, outline, presets. App: floating dock, theme options, backup/restore, update check. Android 16 first; other versions untested.
-
-## Planned features
-
-- Color, Monet (accent / neutral / secondary), transparency, gradient
-- Width, height, corner radius, stroke, alternative shapes
-- Vertical offset and horizontal alignment
-- Contextual styles: keyboard, landscape, charging / low battery, per-app
-- Style profiles, backup / restore
-- Floating Dock navigation mode
+Color (stock / custom / Monet), gradient and rainbow, bar / dot / dots, width, height, corner radius, offset, outline, animation, presets, backup and restore.
 
 ## Requirements
 
-- Pixel or AOSP-based ROM, Android 12–17 (Android 16 tested first)
-- Root with Zygisk (Magisk / KernelSU)
-- **LSPosed 2.0.1 or newer** (or a fork supporting the modern libxposed API 101+). Older LSPosed versions will not list this module.
+- Root (Magisk or KernelSU) with Zygisk
+- LSPosed 2.0.1 or newer (modern libxposed API)
 
 ## Setup
 
-1. Install the APK and open LSPosed → Modules → enable **MyColourfulGesture**.
-2. Scope: tick **System UI** and **MyColourfulGesture** itself (the second one lets the app show an accurate status).
-3. Restart System UI (button on the Home page, or `su -c killall com.android.systemui`).
-4. Open the app → Customize.
+1. Install the APK and enable the module in LSPosed.
+2. Scope: System UI, this app, and your launcher (the app shows its package name on the home page).
+3. Restart System UI and the launcher from the home page.
+
+On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
 
 ## Build
 
-Builds run on GitHub Actions. Every push to `main` produces a debug APK as a workflow artifact and as a pre-release.
+Every push to `main` builds a debug APK through GitHub Actions and attaches it to a pre-release.
 
-## Roadmap
-
-1. App shell + CI (this stage)
-2. Hook MVP: color, transparency, size, corner radius on a single Android version
-3. Customization UI wired to the hook, live preview
-4. Gradient, animation, shapes, profiles, backup
-5. Contextual styles
-6. Multi-version support
-
-## License
+## Lisans / License
 
 MIT
 
 ---
 
-## Türkçe
-
-MyColourfulGesture, Pixel ve AOSP tabanlı Android 12–17 sürümlerinde hareket çubuğunu (Gesture Pill) özelleştiren bir LSPosed modülüdür. Arayüz Material 3 Expressive ile hazırlanmıştır.
-
-**Durum: Aşama 1 – uygulama iskeleti.** Arayüz ve CI hazır, SystemUI hook'u henüz yazılmadı.
+Pixel ve AOSP tabanlı ROM'larda (Android 12-17) hareket çubuğunu özelleştiren LSPosed modülü. Kurulum için LSPosed 2.0.1+ ve root gerekir; kapsama Sistem Arayüzü, uygulamanın kendisi ve başlatıcı eklenmelidir.

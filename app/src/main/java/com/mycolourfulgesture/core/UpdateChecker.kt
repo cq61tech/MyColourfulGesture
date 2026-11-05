@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object UpdateChecker {
-    /** build.gradle: versionCode = CODE_OFFSET + GitHub Actions run numarası */
+    
     const val CODE_OFFSET = 100
 
     data class Result(

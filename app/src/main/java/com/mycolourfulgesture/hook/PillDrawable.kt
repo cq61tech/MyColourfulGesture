@@ -10,13 +10,7 @@ import android.view.View
 import com.mycolourfulgesture.core.PillConfig
 import java.lang.ref.WeakReference
 
-/**
- * Pill view'ının arka planı olarak takılır. ColorDrawable'dan türer: orijinal kod arka planı
- * ColorDrawable'a çevirip rengini animasyonlarsa çökme olmaz, stok renk de buradan okunur.
- *
- * Launcher'da pill view'ı tüm navigasyon alanı kadardır; gerçek pill, view'ın outline'ında küçük bir
- * yuvarlak dikdörtgendir. Ölçüleri o outline'dan (stok pill) alırız, böylece ayarlar stok boyuta göre uygulanır.
- */
+// ColorDrawable: orijinal kod arka planı ColorDrawable sanıp cast ederse çökmesin
 class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE) {
     @Volatile var cfg: PillConfig? = null
     private val ref = WeakReference(view)
@@ -24,7 +18,8 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
     private val tmp = Rect()
     private val stockR = RectF()
 
-    /** Stok pill'in view içindeki dikdörtgenini bulur; outline okunamazsa Pixel varsayılanını kullanır. */
+    
+    // launcher'da view tüm nav alanı kadar, asıl pill outline içinde küçük bir dikdörtgen
     private fun readStock(view: View, w: Float, h: Float, d: Float) {
         try {
             val p = view.outlineProvider
@@ -66,7 +61,6 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
             else -> stockR.width() * c.widthPct / 100f
         }.coerceIn(1f, w)
 
-        // Yatay: stok pill'in ortasından başlar; hAlign ile view'ın sol/sağ kenarına doğru kayar.
         val leftMax = w - totalW
         val left0 = stockR.centerX() - totalW / 2f
         val left = (

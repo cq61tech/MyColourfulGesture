@@ -7,7 +7,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 
-/** SystemUI'deki hook ayarları buradan okur; "get" ve "heartbeat" çağrıları durum bilgisini de kaydeder. */
 class ConfigProvider : ContentProvider() {
 
     override fun onCreate(): Boolean = true

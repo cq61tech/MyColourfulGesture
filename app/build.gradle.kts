@@ -15,10 +15,9 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 100 + (buildNumber ?: 0)
-        versionName = "0.3.0" + (if (buildNumber != null) "-b$buildNumber" else "")
+        versionName = "0.4.0" + (if (buildNumber != null) "-b$buildNumber" else "")
     }
 
-    // Sabit keystore: her CI derlemesi aynı imzayı taşır, böylece APK'lar üzerine güncellenebilir.
     signingConfigs {
         getByName("debug") {
             storeFile = file("debug.keystore")

@@ -110,7 +110,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             }
         }
 
-        // ---------- Hazır stiller ----------
         Block {
             BlockTitle(stringResource(R.string.cust_presets))
             Row(
@@ -130,7 +129,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             }
         }
 
-        // ---------- Renk ----------
         Block {
             BlockTitle(stringResource(R.string.cust_color_section))
             Segments(
@@ -215,7 +213,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             }
         }
 
-        // ---------- Animasyon ----------
         Block {
             BlockTitle(stringResource(R.string.cust_anim_section))
             Segments(
@@ -241,7 +238,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             }
         }
 
-        // ---------- Boyut ve şekil ----------
         Block {
             BlockTitle(stringResource(R.string.cust_size_section))
             Segments(
@@ -285,7 +281,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             }
         }
 
-        // ---------- Konum ----------
         Block {
             BlockTitle(stringResource(R.string.cust_position_section))
             IntSlider(
@@ -306,7 +301,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
             )
         }
 
-        // ---------- Kenar çizgisi ----------
         Block {
             BlockTitle(stringResource(R.string.cust_stroke_section))
             IntSlider(
@@ -335,7 +329,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
     }
 }
 
-/** Yaklaşık önizleme: gerçek pill'in görünümü SystemUI'deki varsayılan ölçülere göre değişebilir. */
 @Composable
 private fun PillPreview(cfg: PillConfig) {
     val context = LocalContext.current

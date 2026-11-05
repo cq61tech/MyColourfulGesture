@@ -62,7 +62,7 @@ class AppSettings(context: Context) {
         sp.edit().putInt(KEY_THEME, mode).apply()
     }
 
-    /** Uygulama arayüzü ayarlarını varsayılana döndürür (dil hariç). */
+    
     fun resetAppSettings() {
         updateThemeMode(THEME_SYSTEM)
         dynamicColor.reset(); seedHue.reset(); amoled.reset()
