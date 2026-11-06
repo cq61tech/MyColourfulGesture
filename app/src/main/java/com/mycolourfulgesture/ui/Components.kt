@@ -1,6 +1,13 @@
 package com.mycolourfulgesture.ui
 
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -28,7 +35,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -112,14 +117,51 @@ internal fun IntSlider(
     onFinished: () -> Unit = {},
     display: ((Int) -> String)? = null,
 ) {
-    SliderRow(
-        label = label,
-        valueText = display?.invoke(value) ?: "$value$suffix",
-        value = value.toFloat(),
-        range = range.first.toFloat()..range.last.toFloat(),
-        onChange = { onChange(it.roundToInt()) },
-        onFinished = onFinished,
-    )
+    var editing by remember { mutableStateOf(false) }
+    Column {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                display?.invoke(value) ?: "$value$suffix",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = if (display == null) Modifier.clickable { editing = true } else Modifier,
+            )
+        }
+        Slider(
+            value = value.toFloat(),
+            onValueChange = { onChange(it.roundToInt()) },
+            valueRange = range.first.toFloat()..range.last.toFloat(),
+            onValueChangeFinished = onFinished,
+        )
+    }
+    if (editing) {
+        var text by remember { mutableStateOf(value.toString()) }
+        AlertDialog(
+            onDismissRequest = { editing = false },
+            title = { Text(label) },
+            text = {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it.filter { c -> c.isDigit() || c == '-' }.take(5) },
+                    singleLine = true,
+                    suffix = { Text(suffix.trim()) },
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    text.toIntOrNull()?.let {
+                        onChange(it.coerceIn(range.first, range.last))
+                        onFinished()
+                    }
+                    editing = false
+                }) { Text(stringResource(R.string.dialog_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { editing = false }) { Text(stringResource(R.string.dialog_cancel)) }
+            },
+        )
+    }
 }
 
 @Composable
@@ -138,7 +180,18 @@ internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> U
 }
 
 @Composable
-internal fun ColorPicker(color: Int, onChange: (Int) -> Unit, onCommit: () -> Unit) {
+internal fun ColorPicker(
+    color: Int,
+    onChange: (Int) -> Unit,
+    onCommit: () -> Unit,
+    compact: Boolean = false,
+) {
+    var hsv by remember { mutableStateOf(hsvOf(color)) }
+    val current = android.graphics.Color.HSVToColor(hsv)
+    LaunchedEffect(color) {
+        if (color != current) hsv = hsvOf(color)
+    }
+
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SWATCHES.forEach { c ->
             val selected = c == color
@@ -159,24 +212,77 @@ internal fun ColorPicker(color: Int, onChange: (Int) -> Unit, onCommit: () -> Un
             ) {}
         }
     }
-    var hue by remember { mutableFloatStateOf(hueOf(color)) }
-    SliderRow(
-        label = stringResource(R.string.cust_hue),
-        valueText = "${hue.roundToInt()}°",
-        value = hue,
-        range = 0f..360f,
-        onChange = {
-            hue = it
-            onChange(Color.hsv(it, 1f, 1f).toArgb())
+
+    if (!compact) {
+        SliderRow(
+            label = stringResource(R.string.cust_hue),
+            valueText = "${hsv[0].roundToInt()}°",
+            value = hsv[0],
+            range = 0f..360f,
+            onChange = {
+                hsv = floatArrayOf(it, hsv[1], hsv[2])
+                onChange(android.graphics.Color.HSVToColor(hsv))
+            },
+            onFinished = onCommit,
+        )
+        SliderRow(
+            label = stringResource(R.string.cust_sat),
+            valueText = "${(hsv[1] * 100).roundToInt()}%",
+            value = hsv[1] * 100f,
+            range = 0f..100f,
+            onChange = {
+                hsv = floatArrayOf(hsv[0], it / 100f, hsv[2])
+                onChange(android.graphics.Color.HSVToColor(hsv))
+            },
+            onFinished = onCommit,
+        )
+        SliderRow(
+            label = stringResource(R.string.cust_val),
+            valueText = "${(hsv[2] * 100).roundToInt()}%",
+            value = hsv[2] * 100f,
+            range = 0f..100f,
+            onChange = {
+                hsv = floatArrayOf(hsv[0], hsv[1], it / 100f)
+                onChange(android.graphics.Color.HSVToColor(hsv))
+            },
+            onFinished = onCommit,
+        )
+    }
+
+    var hex by remember(color) { mutableStateOf("%06X".format(color and 0xFFFFFF)) }
+    OutlinedTextField(
+        value = hex,
+        onValueChange = { v ->
+            val f = v.filter { it.isDigit() || it.uppercaseChar() in 'A'..'F' }.take(6).uppercase()
+            hex = f
+            if (f.length == 6) {
+                onChange(0xFF000000.toInt() or f.toInt(16))
+                onCommit()
+            }
         },
-        onFinished = onCommit,
+        singleLine = true,
+        label = { Text("HEX") },
+        prefix = { Text("#") },
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 
-private fun hueOf(argb: Int): Float {
+@Composable
+internal fun ChipRow(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Row(
+        Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        options.forEachIndexed { i, label ->
+            FilterChip(selected = i == selected, onClick = { onSelect(i) }, label = { Text(label) })
+        }
+    }
+}
+
+private fun hsvOf(argb: Int): FloatArray {
     val hsv = FloatArray(3)
     android.graphics.Color.colorToHSV(argb, hsv)
-    return hsv[0]
+    return hsv
 }
 
 internal fun restartSystemUi(context: Context) = restartProcess(context, "com.android.systemui")

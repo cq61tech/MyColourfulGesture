@@ -80,7 +80,6 @@
     <string name="monet_neutral2">Neutre 2</string>
     <string name="cust_monet_shade">Luminosité</string>
     <string name="cust_gradient">Dégradé</string>
-    <string name="cust_gradient_color">Seconde couleur</string>
     <string name="cust_anim_section">Animation</string>
     <string name="anim_none">Aucune</string>
     <string name="anim_breathe">Respiration</string>
@@ -149,7 +148,6 @@
     <string name="preset_ocean">Océan</string>
     <string name="preset_glass">Verre</string>
     <string name="gradient_off">Uni</string>
-    <string name="gradient_two">2 couleurs</string>
     <string name="gradient_rainbow">Arc-en-ciel</string>
     <string name="set_dock_autohide">Masquer au défilement</string>
     <string name="set_dock_autohide_desc">Disparaît en faisant défiler vers le bas et revient vers le haut</string>
@@ -159,4 +157,25 @@
     <string name="status_launcher">Lanceur</string>
     <string name="status_launcher_hint">Sur cet appareil, la barre est probablement dessinée par votre lanceur (%1$s). Dans LSPosed, cochez cette appli dans la portée du module, puis redémarrez-la.</string>
     <string name="status_restart_launcher">Redémarrer le lanceur (root)</string>
+    <string name="cust_sat">Saturation</string>
+    <string name="cust_val">Luminosité</string>
+    <string name="gradient_custom">Perso</string>
+    <string name="cust_stops">Nombre de couleurs</string>
+    <string name="cust_stop_n">Couleur %1$d</string>
+    <string name="shape_dashes">Tirets</string>
+    <string name="cust_seg_count">Nombre</string>
+    <string name="cust_seg_gap">Espacement</string>
+    <string name="cust_glow">Halo</string>
+    <string name="anim_hue">Cycle de teinte</string>
+    <string name="anim_pulse">Pulsation</string>
+    <string name="cust_my_styles">Mes styles</string>
+    <string name="cust_save_style">Enregistrer le style actuel</string>
+    <string name="cust_style_name">Nom du style</string>
+    <string name="cust_apply">Appliquer</string>
+    <string name="cust_delete">Supprimer</string>
+    <string name="cust_no_styles">Aucun style enregistré</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Enregistrer</string>
+    <string name="cust_tip">Astuce : touchez une valeur pour la saisir précisément</string>
+    <string name="preset_spectrum">Spectre</string>
 </resources>

@@ -80,7 +80,6 @@
     <string name="monet_neutral2">Neutral 2</string>
     <string name="cust_monet_shade">Helligkeit</string>
     <string name="cust_gradient">Verlauf</string>
-    <string name="cust_gradient_color">Zweite Farbe</string>
     <string name="cust_anim_section">Animation</string>
     <string name="anim_none">Keine</string>
     <string name="anim_breathe">Atmen</string>
@@ -149,7 +148,6 @@
     <string name="preset_ocean">Ozean</string>
     <string name="preset_glass">Glas</string>
     <string name="gradient_off">Einfarbig</string>
-    <string name="gradient_two">2 Farben</string>
     <string name="gradient_rainbow">Regenbogen</string>
     <string name="set_dock_autohide">Beim Scrollen ausblenden</string>
     <string name="set_dock_autohide_desc">Verschwindet beim Abwärtsscrollen und kommt beim Aufwärtsscrollen zurück</string>
@@ -159,4 +157,25 @@
     <string name="status_launcher">Launcher</string>
     <string name="status_launcher_hint">Auf diesem Gerät zeichnet wahrscheinlich dein Launcher die Pill (%1$s). Wähle diese App in LSPosed im Bereich des Moduls aus und starte sie neu.</string>
     <string name="status_restart_launcher">Launcher neu starten (Root)</string>
+    <string name="cust_sat">Sättigung</string>
+    <string name="cust_val">Helligkeit</string>
+    <string name="gradient_custom">Eigener</string>
+    <string name="cust_stops">Anzahl der Farben</string>
+    <string name="cust_stop_n">Farbe %1$d</string>
+    <string name="shape_dashes">Striche</string>
+    <string name="cust_seg_count">Anzahl</string>
+    <string name="cust_seg_gap">Abstand</string>
+    <string name="cust_glow">Leuchten</string>
+    <string name="anim_hue">Farbtonzyklus</string>
+    <string name="anim_pulse">Puls</string>
+    <string name="cust_my_styles">Meine Stile</string>
+    <string name="cust_save_style">Aktuellen Stil speichern</string>
+    <string name="cust_style_name">Stilname</string>
+    <string name="cust_apply">Anwenden</string>
+    <string name="cust_delete">Löschen</string>
+    <string name="cust_no_styles">Noch keine gespeicherten Stile</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Speichern</string>
+    <string name="cust_tip">Tipp: Tippe auf einen Wert, um ihn genau einzugeben</string>
+    <string name="preset_spectrum">Spektrum</string>
 </resources>

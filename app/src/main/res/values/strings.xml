@@ -90,7 +90,6 @@
     <string name="monet_neutral2">Neutral 2</string>
     <string name="cust_monet_shade">Shade</string>
     <string name="cust_gradient">Gradient</string>
-    <string name="cust_gradient_color">Second color</string>
     <string name="cust_anim_section">Animation</string>
     <string name="anim_none">None</string>
     <string name="anim_breathe">Breathe</string>
@@ -159,7 +158,6 @@
     <string name="preset_ocean">Ocean</string>
     <string name="preset_glass">Glass</string>
     <string name="gradient_off">Solid</string>
-    <string name="gradient_two">2 colors</string>
     <string name="gradient_rainbow">Rainbow</string>
     <string name="set_dock_autohide">Hide when scrolling</string>
     <string name="set_dock_autohide_desc">Slides away as you scroll down, returns as you scroll up</string>
@@ -169,4 +167,25 @@
     <string name="status_launcher">Launcher</string>
     <string name="status_launcher_hint">On this device the pill is probably drawn by your launcher (%1$s). In LSPosed, tick that app in this module’s scope, then restart it.</string>
     <string name="status_restart_launcher">Restart launcher (root)</string>
+    <string name="cust_sat">Saturation</string>
+    <string name="cust_val">Brightness</string>
+    <string name="gradient_custom">Custom</string>
+    <string name="cust_stops">Number of colors</string>
+    <string name="cust_stop_n">Color %1$d</string>
+    <string name="shape_dashes">Dashes</string>
+    <string name="cust_seg_count">Count</string>
+    <string name="cust_seg_gap">Gap</string>
+    <string name="cust_glow">Glow</string>
+    <string name="anim_hue">Hue cycle</string>
+    <string name="anim_pulse">Pulse</string>
+    <string name="cust_my_styles">My styles</string>
+    <string name="cust_save_style">Save current style</string>
+    <string name="cust_style_name">Style name</string>
+    <string name="cust_apply">Apply</string>
+    <string name="cust_delete">Delete</string>
+    <string name="cust_no_styles">No saved styles yet</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Save</string>
+    <string name="cust_tip">Tip: tap a value to type it exactly</string>
+    <string name="preset_spectrum">Spectrum</string>
 </resources>

@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import com.mycolourfulgesture.core.PillConfig
+import com.mycolourfulgesture.core.PillGeometry
 import java.lang.ref.WeakReference
 
 // ColorDrawable: orijinal kod arka planı ColorDrawable sanıp cast ederse çökmesin
@@ -18,7 +19,6 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
     private val tmp = Rect()
     private val stockR = RectF()
 
-    
     // launcher'da view tüm nav alanı kadar, asıl pill outline içinde küçük bir dikdörtgen
     private fun readStock(view: View, w: Float, h: Float, d: Float) {
         try {
@@ -54,12 +54,7 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
         readStock(view, w, h, d)
 
         val pillH = (stockR.height() * c.heightPct / 100f).coerceIn(1f, h)
-        val gap = pillH * 0.9f
-        val totalW = when (c.shape) {
-            PillConfig.SHAPE_DOT -> pillH
-            PillConfig.SHAPE_DOTS -> pillH * 3f + gap * 2f
-            else -> stockR.width() * c.widthPct / 100f
-        }.coerceIn(1f, w)
+        val totalW = PillGeometry.totalWidth(c, stockR.width(), pillH, w)
 
         val leftMax = w - totalW
         val left0 = stockR.centerX() - totalW / 2f
@@ -73,7 +68,7 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
         val corner = pillH / 2f * c.cornerPct / 100f
 
         val animating = PillRenderer.render(
-            canvas, view.context, c, b.left + left, b.top + top, totalW, pillH, gap, corner, d, color,
+            canvas, view.context, c, b.left + left, b.top + top, totalW, pillH, corner, d, color,
         )
         if (animating) view.postInvalidateDelayed(40L)
     }

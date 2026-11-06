@@ -80,7 +80,6 @@
     <string name="monet_neutral2">Нейтральный 2</string>
     <string name="cust_monet_shade">Яркость тона</string>
     <string name="cust_gradient">Градиент</string>
-    <string name="cust_gradient_color">Второй цвет</string>
     <string name="cust_anim_section">Анимация</string>
     <string name="anim_none">Нет</string>
     <string name="anim_breathe">Дыхание</string>
@@ -149,7 +148,6 @@
     <string name="preset_ocean">Океан</string>
     <string name="preset_glass">Стекло</string>
     <string name="gradient_off">Сплошной</string>
-    <string name="gradient_two">2 цвета</string>
     <string name="gradient_rainbow">Радуга</string>
     <string name="set_dock_autohide">Скрывать при прокрутке</string>
     <string name="set_dock_autohide_desc">Уходит вниз при прокрутке вниз и возвращается при прокрутке вверх</string>
@@ -159,4 +157,25 @@
     <string name="status_launcher">Лаунчер</string>
     <string name="status_launcher_hint">Похоже, на этом устройстве полоску рисует ваш лаунчер (%1$s). В LSPosed отметьте это приложение в области действия модуля и перезапустите его.</string>
     <string name="status_restart_launcher">Перезапустить лаунчер (root)</string>
+    <string name="cust_sat">Насыщенность</string>
+    <string name="cust_val">Яркость</string>
+    <string name="gradient_custom">Свой</string>
+    <string name="cust_stops">Количество цветов</string>
+    <string name="cust_stop_n">Цвет %1$d</string>
+    <string name="shape_dashes">Штрихи</string>
+    <string name="cust_seg_count">Количество</string>
+    <string name="cust_seg_gap">Промежуток</string>
+    <string name="cust_glow">Свечение</string>
+    <string name="anim_hue">Смена оттенка</string>
+    <string name="anim_pulse">Пульс</string>
+    <string name="cust_my_styles">Мои стили</string>
+    <string name="cust_save_style">Сохранить текущий стиль</string>
+    <string name="cust_style_name">Название стиля</string>
+    <string name="cust_apply">Применить</string>
+    <string name="cust_delete">Удалить</string>
+    <string name="cust_no_styles">Сохранённых стилей пока нет</string>
+    <string name="dialog_ok">ОК</string>
+    <string name="dialog_save">Сохранить</string>
+    <string name="cust_tip">Совет: нажмите на значение, чтобы ввести его точно</string>
+    <string name="preset_spectrum">Спектр</string>
 </resources>

@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.util.Log
 import android.view.View
 import com.mycolourfulgesture.core.PillConfig
+import com.mycolourfulgesture.core.PillGeometry
 import io.github.libxposed.api.XposedInterface
 import java.lang.reflect.Field
 
@@ -48,19 +49,14 @@ object PillDrawer {
         val bottomMargin = readFloat(view, "mBottom") ?: (8f * d)
 
         val pillH = (baseHeight * cfg.heightPct / 100f).coerceIn(1f, h)
-        val gap = pillH * 0.9f
-        val totalW = when (cfg.shape) {
-            PillConfig.SHAPE_DOT -> pillH
-            PillConfig.SHAPE_DOTS -> pillH * 3f + gap * 2f
-            else -> w * cfg.widthPct / 100f
-        }.coerceIn(1f, w)
+        val totalW = PillGeometry.totalWidth(cfg, w, pillH, w)
         val free = w - totalW
         val left = (free / 2f * (1f + cfg.hAlign / 100f)).coerceIn(0f, free)
         val bottom = (h - bottomMargin - cfg.offsetDp * d).coerceIn(pillH, h)
         val top = bottom - pillH
         val corner = pillH / 2f * cfg.cornerPct / 100f
 
-        val animating = PillRenderer.render(canvas, view.context, cfg, left, top, totalW, pillH, gap, corner, d, readPaintColor(view))
+        val animating = PillRenderer.render(canvas, view.context, cfg, left, top, totalW, pillH, corner, d, readPaintColor(view))
         if (animating) view.postInvalidateDelayed(40L)
     }
 

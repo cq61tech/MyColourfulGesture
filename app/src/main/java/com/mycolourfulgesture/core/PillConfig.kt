@@ -38,11 +38,20 @@ data class PillConfig(
     val hAlign: Int = 0,
     val strokeDp10: Int = 0,
     val strokeColor: Int = -1,
+    val color3: Int = 0xFFFFB84D.toInt(),
+    val color4: Int = 0xFF4CD39B.toInt(),
+    val color5: Int = 0xFF5B8CFF.toInt(),
+    val gradStops: Int = 2,
+    val segCount: Int = 3,
+    val gapPct: Int = 90,
+    val glowPct: Int = 0,
 ) {
+    fun stops(first: Int): IntArray = intArrayOf(first, color2, color3, color4, color5).copyOfRange(0, gradStops)
+
     val isIdentity: Boolean
         get() = colorMode == COLOR_STOCK && alphaPct == 100 && gradient == 0 && animMode == ANIM_NONE &&
             shape == SHAPE_BAR && widthPct == 100 && heightPct == 100 && cornerPct == 100 &&
-            offsetDp == 0 && hAlign == 0 && strokeDp10 == 0
+            offsetDp == 0 && hAlign == 0 && strokeDp10 == 0 && glowPct == 0
 
     private fun entries(): Map<String, Int> = linkedMapOf(
         "c_hook" to b(hookEnabled), "c_debug" to b(debug), "c_enabled" to b(enabled),
@@ -53,6 +62,8 @@ data class PillConfig(
         "c_width" to widthPct, "c_height" to heightPct, "c_corner" to cornerPct,
         "c_offset" to offsetDp, "c_halign" to hAlign,
         "c_stroke" to strokeDp10, "c_stroke_color" to strokeColor,
+        "c_color3" to color3, "c_color4" to color4, "c_color5" to color5,
+        "c_stops" to gradStops, "c_segs" to segCount, "c_gap" to gapPct, "c_glow" to glowPct,
     )
 
     fun toBundle(): Bundle = Bundle().also { bundle -> entries().forEach { (k, v) -> bundle.putInt(k, v) } }
@@ -75,6 +86,9 @@ data class PillConfig(
         const val SHAPE_BAR = 0
         const val SHAPE_DOT = 1
         const val SHAPE_DOTS = 2
+        const val SHAPE_DASHES = 3
+        const val ANIM_HUE = 3
+        const val ANIM_PULSE = 4
         val RAINBOW = intArrayOf(
             0xFFFF3B30.toInt(), 0xFFFF9500.toInt(), 0xFFFFCC00.toInt(),
             0xFF34C759.toInt(), 0xFF007AFF.toInt(), 0xFFAF52DE.toInt(),
@@ -94,16 +108,23 @@ data class PillConfig(
                 alphaPct = g("c_alpha", d.alphaPct).coerceIn(0, 100),
                 gradient = g("c_gradient", 0).coerceIn(0, 2),
                 color2 = g("c_color2", d.color2),
-                animMode = g("c_anim", d.animMode).coerceIn(0, 2),
+                animMode = g("c_anim", d.animMode).coerceIn(0, 4),
                 animSpeed = g("c_anim_speed", d.animSpeed).coerceIn(30, 300),
-                shape = g("c_shape", d.shape).coerceIn(0, 2),
-                widthPct = g("c_width", d.widthPct).coerceIn(5, 100),
+                shape = g("c_shape", d.shape).coerceIn(0, 3),
+                widthPct = g("c_width", d.widthPct).coerceIn(5, 400),
                 heightPct = g("c_height", d.heightPct).coerceIn(30, 600),
                 cornerPct = g("c_corner", d.cornerPct).coerceIn(0, 100),
-                offsetDp = g("c_offset", d.offsetDp).coerceIn(-8, 30),
+                offsetDp = g("c_offset", d.offsetDp).coerceIn(-16, 40),
                 hAlign = g("c_halign", d.hAlign).coerceIn(-100, 100),
                 strokeDp10 = g("c_stroke", d.strokeDp10).coerceIn(0, 40),
                 strokeColor = g("c_stroke_color", d.strokeColor),
+                color3 = g("c_color3", d.color3),
+                color4 = g("c_color4", d.color4),
+                color5 = g("c_color5", d.color5),
+                gradStops = g("c_stops", d.gradStops).coerceIn(2, 5),
+                segCount = g("c_segs", d.segCount).coerceIn(1, 9),
+                gapPct = g("c_gap", d.gapPct).coerceIn(0, 300),
+                glowPct = g("c_glow", d.glowPct).coerceIn(0, 100),
             )
         }
 
@@ -130,5 +151,18 @@ object MonetColors {
         val shade = PillConfig.MONET_SHADES.getOrElse(shadeIdx) { 500 }
         val id = ctx.resources.getIdentifier("${p}_$shade", "color", "android")
         return if (id != 0) ctx.getColor(id) else -1
+    }
+}
+
+object PillGeometry {
+    fun gap(cfg: PillConfig, pillH: Float): Float = pillH * cfg.gapPct / 100f
+
+    fun totalWidth(cfg: PillConfig, baseW: Float, pillH: Float, maxW: Float): Float {
+        val w = when (cfg.shape) {
+            PillConfig.SHAPE_DOT -> pillH
+            PillConfig.SHAPE_DOTS -> pillH * cfg.segCount + gap(cfg, pillH) * (cfg.segCount - 1)
+            else -> baseW * cfg.widthPct / 100f
+        }
+        return w.coerceIn(1f, maxW)
     }
 }

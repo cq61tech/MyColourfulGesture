@@ -90,7 +90,6 @@
     <string name="monet_neutral2">Nötr 2</string>
     <string name="cust_monet_shade">Ton parlaklığı</string>
     <string name="cust_gradient">Gradient</string>
-    <string name="cust_gradient_color">İkinci renk</string>
     <string name="cust_anim_section">Animasyon</string>
     <string name="anim_none">Yok</string>
     <string name="anim_breathe">Nefes</string>
@@ -159,7 +158,6 @@
     <string name="preset_ocean">Okyanus</string>
     <string name="preset_glass">Cam</string>
     <string name="gradient_off">Düz</string>
-    <string name="gradient_two">2 renk</string>
     <string name="gradient_rainbow">Gökkuşağı</string>
     <string name="set_dock_autohide">Kaydırırken gizle</string>
     <string name="set_dock_autohide_desc">Aşağı kaydırınca gizlenir, yukarı kaydırınca geri gelir</string>
@@ -169,4 +167,25 @@
     <string name="status_launcher">Başlatıcı</string>
     <string name="status_launcher_hint">Bu cihazda pill muhtemelen başlatıcı tarafından çiziliyor (%1$s). LSPosed’da bu modülün kapsamında o uygulamayı işaretle, sonra yeniden başlat.</string>
     <string name="status_restart_launcher">Başlatıcıyı yeniden başlat (root)</string>
+    <string name="cust_sat">Doygunluk</string>
+    <string name="cust_val">Parlaklık</string>
+    <string name="gradient_custom">Özel</string>
+    <string name="cust_stops">Renk sayısı</string>
+    <string name="cust_stop_n">Renk %1$d</string>
+    <string name="shape_dashes">Çizgiler</string>
+    <string name="cust_seg_count">Adet</string>
+    <string name="cust_seg_gap">Boşluk</string>
+    <string name="cust_glow">Parıltı</string>
+    <string name="anim_hue">Ton döngüsü</string>
+    <string name="anim_pulse">Nabız</string>
+    <string name="cust_my_styles">Stillerim</string>
+    <string name="cust_save_style">Mevcut stili kaydet</string>
+    <string name="cust_style_name">Stil adı</string>
+    <string name="cust_apply">Uygula</string>
+    <string name="cust_delete">Sil</string>
+    <string name="cust_no_styles">Henüz kayıtlı stil yok</string>
+    <string name="dialog_ok">Tamam</string>
+    <string name="dialog_save">Kaydet</string>
+    <string name="cust_tip">İpucu: tam değer yazmak için değere dokun</string>
+    <string name="preset_spectrum">Spektrum</string>
 </resources>

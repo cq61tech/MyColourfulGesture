@@ -2,7 +2,7 @@
 
 LSPosed module that restyles the gesture pill on Pixel and AOSP-based ROMs (Android 12-17), with a small companion app.
 
-Color (stock / custom / Monet), gradient and rainbow, bar / dot / dots, width, height, corner radius, offset, outline, animation, presets, backup and restore.
+Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and rainbow gradients, bar / dot / dots / dashes, size, corner radius, offset, outline, glow, animations, presets, your own saved styles, backup and restore.
 
 ## Requirements
 

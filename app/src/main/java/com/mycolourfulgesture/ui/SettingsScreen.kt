@@ -43,7 +43,6 @@ import com.mycolourfulgesture.Constants
 import com.mycolourfulgesture.PillState
 import com.mycolourfulgesture.R
 import com.mycolourfulgesture.core.HookStatus
-import com.mycolourfulgesture.core.PillConfig
 
 private val LANGUAGES = listOf(
     "en" to "English", "tr" to "Türkçe", "ru" to "Русский",
@@ -69,7 +68,7 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) {
             val ok = runCatching {
-                context.contentResolver.openOutputStream(uri)?.use { it.write(pill.config.toJson().toByteArray()) }
+                context.contentResolver.openOutputStream(uri)?.use { it.write(pill.exportJson().toByteArray()) }
             }.isSuccess
             toast(if (ok) R.string.set_export_ok else R.string.set_export_fail)
         }
@@ -79,9 +78,7 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             val text = runCatching {
                 context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             }.getOrNull()
-            val parsed = text?.let { PillConfig.fromJson(it) }
-            if (parsed != null) {
-                pill.import(parsed)
+            if (text != null && pill.importJson(text)) {
                 toast(R.string.set_import_ok)
             } else {
                 toast(R.string.set_import_fail)
