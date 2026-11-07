@@ -2,7 +2,7 @@
 
 package com.mycolourfulgesture.core
 
-private var stub = false
+@Volatile private var stub = false
 
 fun isModuleActive(): Boolean = stub
 

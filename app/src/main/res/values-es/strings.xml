@@ -196,4 +196,5 @@
     <string name="quick_monet_on">Sí</string>
     <string name="settings_lang_system">Predeterminado del sistema</string>
     <string name="tile_label">Estilo de barra</string>
+    <string name="set_diag_abi">Arquitectura de CPU</string>
 </resources>

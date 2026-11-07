@@ -206,4 +206,5 @@
     <string name="quick_monet_on">Açık</string>
     <string name="settings_lang_system">Sistem varsayılanı</string>
     <string name="tile_label">Pill stili</string>
+    <string name="set_diag_abi">İşlemci mimarisi</string>
 </resources>

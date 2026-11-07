@@ -196,4 +196,5 @@
     <string name="quick_monet_on">Вкл.</string>
     <string name="settings_lang_system">Как в системе</string>
     <string name="tile_label">Стиль полоски</string>
+    <string name="set_diag_abi">Архитектура процессора</string>
 </resources>

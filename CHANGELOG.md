@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.8.0
+
+### Compatibility
+- One universal APK that runs on armeabi-v7a, arm64-v8a, x86 and x86_64. There are no per-ABI splits
+- Targets Android 12 to 17 (API 31 to 37)
+- The pill search has a fallback for Android versions where the window list API is not reachable, and it recognizes more handle view names
+- More launchers are recommended in the LSPosed scope (One UI Home, HyperOS Home)
+
+### Size and speed
+- The release build is shrunk with R8 and unused resources are removed, so the APK is much smaller
+- Only the six supported languages are packaged
+- Each build now publishes two APKs: the shrunk `-universal` one and an unshrunk `-debug` one as a fallback
+- CI prints the ABIs inside the APK and checks 16 KB page alignment
+
+### Diagnostics
+- CPU architecture is shown in Settings
+
 ## v0.7.0
 
 ### Features

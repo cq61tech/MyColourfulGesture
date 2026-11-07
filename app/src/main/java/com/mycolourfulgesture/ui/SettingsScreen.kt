@@ -226,6 +226,7 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             val none = stringResource(R.string.set_diag_none)
             DiagRow(stringResource(R.string.device_android), "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
             DiagRow(stringResource(R.string.device_model), "${Build.MANUFACTURER} ${Build.MODEL}")
+            DiagRow(stringResource(R.string.set_diag_abi), Build.SUPPORTED_ABIS.firstOrNull() ?: "?")
             DiagRow(stringResource(R.string.set_diag_framework), status.framework.ifBlank { none })
             DiagRow(stringResource(R.string.set_diag_class), status.hookedClass?.substringAfterLast('.') ?: none)
             status.probe?.let {

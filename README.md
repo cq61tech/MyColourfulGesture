@@ -17,6 +17,10 @@ Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and r
 
 On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
 
+## Compatibility
+
+Android 12 to 17 on 32-bit and 64-bit ARM, plus x86. The release APK is universal, so there is nothing to pick. Each build also ships a `-debug` APK that is not shrunk; use it if the main one misbehaves on your device.
+
 ## Languages
 
 English, Turkish, Russian, Spanish, German, French. To add one, copy `app/src/main/res/values/strings.xml` to `values-xx/strings.xml`, translate it, add the code to `res/xml/locales_config.xml` and to the `LANGUAGES` list in `SettingsScreen.kt`, then open a pull request.
@@ -29,4 +33,6 @@ Every push to `main` builds a debug APK through GitHub Actions and attaches it t
 
 MIT
 
+---
 
+Pixel ve AOSP tabanlı ROM'larda (Android 12-17) hareket çubuğunu özelleştiren LSPosed modülü. Kurulum için LSPosed 2.0.1+ ve root gerekir; kapsama Sistem Arayüzü, uygulamanın kendisi ve başlatıcı eklenmelidir.

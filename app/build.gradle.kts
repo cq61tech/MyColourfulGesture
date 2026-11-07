@@ -15,7 +15,21 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 100 + (buildNumber ?: 0)
-        versionName = "0.7.0" + (if (buildNumber != null) "-b$buildNumber" else "")
+        versionName = "0.8.0" + (if (buildNumber != null) "-b$buildNumber" else "")
+
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
+    }
+
+    androidResources {
+        localeFilters += listOf("en", "tr", "ru", "es", "de", "fr")
+    }
+
+    splits {
+        abi {
+            isEnable = false
+        }
     }
 
     signingConfigs {
@@ -29,7 +43,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -44,8 +60,14 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += listOf("/META-INF/{AL2.0,LGPL2.1}", "DebugProbesKt.bin", "kotlin-tooling-metadata.json")
+        }
+    }
     lint {
         abortOnError = false
+        checkReleaseBuilds = false
     }
 }
 

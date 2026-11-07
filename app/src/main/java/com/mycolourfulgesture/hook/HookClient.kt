@@ -23,6 +23,10 @@ import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
+private val HANDLE_IDS = setOf(
+    "home_handle", "navigation_handle", "nav_handle", "gesture_handle", "gesture_hint", "nav_bar_handle",
+)
+
 object HookClient {
     @Volatile var base: PillConfig? = null
     @Volatile var rules: Map<String, PillConfig> = emptyMap()
@@ -245,16 +249,9 @@ object HookClient {
         val names = LinkedHashSet<String>()
         var roots = 0
         try {
-            val wmg = Class.forName("android.view.WindowManagerGlobal")
-            val inst = wmg.getMethod("getInstance").invoke(null)
-            val rootNames = wmg.getMethod("getViewRootNames").invoke(inst) as? Array<*>
-            val getRoot = wmg.getMethod("getRootView", String::class.java)
-            rootNames?.forEach { n ->
-                val root = getRoot.invoke(inst, n) as? View
-                if (root != null) {
-                    roots++
-                    walk(root, found, names, 0)
-                }
+            rootViews().forEach { root ->
+                roots++
+                walk(root, found, names, 0)
             }
         } catch (t: Throwable) {
             discovery = "scan failed: " + t.javaClass.simpleName
@@ -296,12 +293,27 @@ object HookClient {
         invalidateAll()
     }
 
+    private fun rootViews(): List<View> {
+        val wmg = Class.forName("android.view.WindowManagerGlobal")
+        val inst = wmg.getMethod("getInstance").invoke(null)
+        try {
+            val names = wmg.getMethod("getViewRootNames").invoke(inst) as? Array<*> ?: emptyArray<Any>()
+            val getRoot = wmg.getMethod("getRootView", String::class.java)
+            val out = names.mapNotNull { getRoot.invoke(inst, it) as? View }
+            if (out.isNotEmpty()) return out
+        } catch (_: Throwable) {
+        }
+        val field = wmg.getDeclaredField("mViews").apply { isAccessible = true }
+        @Suppress("UNCHECKED_CAST")
+        return (field.get(inst) as? List<View>) ?: emptyList()
+    }
+
     private fun walk(v: View, out: MutableList<View>, names: MutableSet<String>, depth: Int) {
         if (depth > 40) return
         val cn = v.javaClass.name
         val id = idOf(v)
         val isHandle = cn.contains("NavigationHandle", true) || cn.contains("NavHandle", true) ||
-            cn.contains("HandleView", true) || id == "home_handle"
+            cn.contains("HandleView", true) || id in HANDLE_IDS
         if (isHandle) out.add(v)
         if (cn.contains("Navigation", true) || id.contains("handle", true)) {
             names.add(cn.substringAfterLast('.') + (if (id.isNotEmpty()) "#$id" else ""))

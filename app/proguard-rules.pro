@@ -1,0 +1,6 @@
+-keep class com.mycolourfulgesture.hook.** { *; }
+-keep class com.mycolourfulgesture.core.** { *; }
+-keep class * extends io.github.libxposed.api.XposedModule { *; }
+-keep class * implements io.github.libxposed.api.XposedInterface$Hooker { *; }
+-dontwarn io.github.libxposed.**
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod

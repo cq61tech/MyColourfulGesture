@@ -27,16 +27,28 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
-      - name: Build debug APK
-        run: gradle assembleDebug --stacktrace -PbuildNumber=${{ github.run_number }}
+      - name: Build universal release and debug APKs
+        run: gradle assembleRelease assembleDebug --stacktrace -PbuildNumber=${{ github.run_number }}
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk MyColourfulGesture-build${{ github.run_number }}.apk
+      - name: Collect APKs
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk MyColourfulGesture-build${{ github.run_number }}-universal.apk
+          cp app/build/outputs/apk/debug/app-debug.apk MyColourfulGesture-build${{ github.run_number }}-debug.apk
+
+      - name: Inspect APK
+        continue-on-error: true
+        run: |
+          APK=MyColourfulGesture-build${{ github.run_number }}-universal.apk
+          ls -lh MyColourfulGesture-build*.apk
+          echo "ABIs:"
+          unzip -l "$APK" | awk '{print $4}' | grep '^lib/' | cut -d/ -f2 | sort -u
+          ZA=$(ls $ANDROID_HOME/build-tools/*/zipalign | sort -V | tail -1)
+          "$ZA" -c -P 16 -v 4 "$APK" | tail -3
 
       - uses: actions/upload-artifact@v4
         with:
           name: MyColourfulGesture-build${{ github.run_number }}
-          path: MyColourfulGesture-build${{ github.run_number }}.apk
+          path: MyColourfulGesture-build${{ github.run_number }}-*.apk
 
       - name: Publish pre-release
         uses: softprops/action-gh-release@v2
@@ -45,4 +57,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Build ${{ github.run_number }}
           prerelease: true
-          files: MyColourfulGesture-build${{ github.run_number }}.apk
+          files: |
+            MyColourfulGesture-build${{ github.run_number }}-universal.apk
+            MyColourfulGesture-build${{ github.run_number }}-debug.apk

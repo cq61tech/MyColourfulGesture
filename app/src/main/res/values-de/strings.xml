@@ -196,4 +196,5 @@
     <string name="quick_monet_on">Ein</string>
     <string name="settings_lang_system">Systemstandard</string>
     <string name="tile_label">Pill-Stil</string>
+    <string name="set_diag_abi">CPU-Architektur</string>
 </resources>

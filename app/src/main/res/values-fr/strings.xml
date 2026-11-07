@@ -196,4 +196,5 @@
     <string name="quick_monet_on">Activé</string>
     <string name="settings_lang_system">Par défaut du système</string>
     <string name="tile_label">Style de la barre</string>
+    <string name="set_diag_abi">Architecture du processeur</string>
 </resources>
