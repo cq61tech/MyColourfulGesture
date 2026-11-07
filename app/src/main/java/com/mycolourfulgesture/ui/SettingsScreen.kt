@@ -52,7 +52,7 @@ private const val LAUNCHER_ALIAS = "com.mycolourfulgesture.LauncherAlias"
 
 private fun currentLanguage(): String {
     val locales = AppCompatDelegate.getApplicationLocales()
-    return if (locales.isEmpty()) "en" else (locales.get(0)?.language ?: "en")
+    return if (locales.isEmpty()) "system" else (locales.get(0)?.language ?: "en")
 }
 
 @Composable
@@ -108,6 +108,14 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
                 Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                FilterChip(
+                    selected = lang == "system",
+                    onClick = {
+                        lang = "system"
+                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+                    },
+                    label = { Text(stringResource(R.string.settings_lang_system)) },
+                )
                 LANGUAGES.forEach { (tag, name) ->
                     FilterChip(
                         selected = lang == tag,

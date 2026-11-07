@@ -1,7 +1,12 @@
 package com.mycolourfulgesture.hook
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.res.Configuration
 import android.database.ContentObserver
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -13,12 +18,14 @@ import android.view.ViewGroup
 import com.mycolourfulgesture.core.ConfigContract
 import com.mycolourfulgesture.core.HookStatus
 import com.mycolourfulgesture.core.PillConfig
+import com.mycolourfulgesture.core.RuleStore
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 object HookClient {
-    @Volatile var config: PillConfig? = null
+    @Volatile var base: PillConfig? = null
+    @Volatile var rules: Map<String, PillConfig> = emptyMap()
     @Volatile var frameworkInfo: String = ""
     @Volatile var apiVersion: Int = 0
     @Volatile var hookedClass: String? = null
@@ -45,12 +52,49 @@ object HookClient {
     private var appContext: Context? = null
     private var loggedOk = false
     private var lastDiscoveryLog: String? = null
+    @Volatile private var charging = false
+    @Volatile private var lowBattery = false
+    private var mergedKey: String? = null
+    private var mergedFrom: PillConfig? = null
+    private var merged: PillConfig? = null
+
+    val config: PillConfig? get() {
+        val ctx = appContext ?: return base
+        return current(ctx)
+    }
+
+    // düşük pil > şarj > yatay sırasıyla, tanımlı olan ilk kural geçerli olur
+    private fun current(ctx: Context): PillConfig? {
+        val b = base ?: return null
+        if (rules.isEmpty()) return b
+        val landscape = ctx.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val key = when {
+            lowBattery && rules.containsKey("low") -> "low"
+            charging && rules.containsKey("charging") -> "charging"
+            landscape && rules.containsKey("landscape") -> "landscape"
+            else -> null
+        } ?: return b
+        if (key == mergedKey && b === mergedFrom) return merged
+        val m = rules.getValue(key).copy(hookEnabled = b.hookEnabled, debug = b.debug, enabled = b.enabled)
+        mergedKey = key
+        mergedFrom = b
+        merged = m
+        return m
+    }
+
+    private fun updateBattery(i: Intent) {
+        val level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+        val scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
+        val plugged = i.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
+        val status = i.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+        charging = plugged != 0 || status == BatteryManager.BATTERY_STATUS_CHARGING
+        lowBattery = !charging && level >= 0 && level * 100 / scale <= 15
+    }
 
     val isSystemUi: Boolean get() = pkg == "com.android.systemui"
 
     fun isStyled(v: Any?): Boolean = v is View && styled.contains(v)
 
-    
     private fun applyStylesNow() {
         val cfg = config
         val snap = synchronized(styled) { styled.toList() }
@@ -77,7 +121,6 @@ object HookClient {
         }
     }
 
-    
     fun startEarly() {
         val h = Handler(Looper.getMainLooper())
         var tries = 0
@@ -117,6 +160,18 @@ object HookClient {
             log(Log.WARN, "observer register failed: ${t.javaClass.simpleName}")
         }
         h.post { load(0) }
+        try {
+            val sticky = ctx.registerReceiver(object : BroadcastReceiver() {
+                override fun onReceive(c: Context, i: Intent) {
+                    updateBattery(i)
+                    invalidateAll()
+                    main.post { applyStylesNow() }
+                }
+            }, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            if (sticky != null) updateBattery(sticky)
+        } catch (t: Throwable) {
+            log(Log.WARN, "battery receiver failed: ${t.javaClass.simpleName}")
+        }
         log(Log.INFO, "device: ${Build.MANUFACTURER} ${Build.MODEL} / Android ${Build.VERSION.RELEASE} / ${Build.FINGERPRINT}")
         longArrayOf(4000L, 10000L, 20000L, 40000L, 70000L).forEach { d -> main.postDelayed({ discover() }, d) }
         if (!isSystemUi) {
@@ -152,13 +207,15 @@ object HookClient {
         putInt(HookStatus.K_DRAWS, entered)
     }
 
-    
     private fun load(attempt: Int) {
         val ctx = appContext ?: return
         try {
             val b = ctx.contentResolver.call(ConfigContract.URI, ConfigContract.METHOD_GET, null, buildExtras())
             val cfg = PillConfig.fromBundle(b)
-            config = cfg
+            base = cfg
+            rules = if (b == null) emptyMap() else RuleStore.NAMES
+                .filter { b.getBoolean("$it:on", false) }
+                .associateWith { PillConfig.fromBundle(b, "$it:") }
             if (!loggedOk || cfg.debug) {
                 loggedOk = true
                 log(Log.INFO, "config loaded (attempt $attempt): identity=${cfg.isIdentity} enabled=${cfg.enabled} hook=${cfg.hookEnabled}")
@@ -182,7 +239,6 @@ object HookClient {
         }
     }
 
-    
     // pencere ağacında pill view'ını bulur ve ilk bulunanı stillendirir
     private fun discover() {
         val found = ArrayList<View>()

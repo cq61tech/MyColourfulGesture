@@ -188,4 +188,22 @@
     <string name="dialog_save">Save</string>
     <string name="cust_tip">Tip: tap a value to type it exactly</string>
     <string name="preset_spectrum">Spectrum</string>
+    <string name="ctx_title">Contextual styles</string>
+    <string name="ctx_desc">Switch to a different look automatically while charging, on low battery or in landscape. Set the look you want first, then tap Use current look.</string>
+    <string name="ctx_charging">While charging</string>
+    <string name="ctx_low">Low battery (15 or below)</string>
+    <string name="ctx_landscape">Landscape</string>
+    <string name="ctx_set">Use current look</string>
+    <string name="ctx_remove">Remove</string>
+    <string name="ctx_active">Has its own style</string>
+    <string name="ctx_inactive">Same as the main style</string>
+    <string name="ctx_from">Or use a saved style:</string>
+    <string name="cust_random">Surprise me</string>
+    <string name="cust_share">Share</string>
+    <string name="cust_paste">Paste style from clipboard</string>
+    <string name="cust_paste_ok">Style imported</string>
+    <string name="cust_paste_fail">Clipboard does not contain a style</string>
+    <string name="quick_monet_on">On</string>
+    <string name="settings_lang_system">System default</string>
+    <string name="tile_label">Pill style</string>
 </resources>

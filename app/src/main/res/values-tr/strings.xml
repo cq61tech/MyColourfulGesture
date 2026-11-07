@@ -188,4 +188,22 @@
     <string name="dialog_save">Kaydet</string>
     <string name="cust_tip">İpucu: tam değer yazmak için değere dokun</string>
     <string name="preset_spectrum">Spektrum</string>
+    <string name="ctx_title">Bağlamsal stiller</string>
+    <string name="ctx_desc">Şarj olurken, pil azken veya yatay modda otomatik olarak farklı bir görünüme geç. Önce istediğin görünümü ayarla, sonra Mevcut görünümü kullan’a dokun.</string>
+    <string name="ctx_charging">Şarj olurken</string>
+    <string name="ctx_low">Düşük pil (15 ve altı)</string>
+    <string name="ctx_landscape">Yatay mod</string>
+    <string name="ctx_set">Mevcut görünümü kullan</string>
+    <string name="ctx_remove">Kaldır</string>
+    <string name="ctx_active">Kendi stili var</string>
+    <string name="ctx_inactive">Ana stille aynı</string>
+    <string name="ctx_from">Ya da kayıtlı bir stil kullan:</string>
+    <string name="cust_random">Şaşırt beni</string>
+    <string name="cust_share">Paylaş</string>
+    <string name="cust_paste">Stili panodan yapıştır</string>
+    <string name="cust_paste_ok">Stil içe aktarıldı</string>
+    <string name="cust_paste_fail">Panoda bir stil yok</string>
+    <string name="quick_monet_on">Açık</string>
+    <string name="settings_lang_system">Sistem varsayılanı</string>
+    <string name="tile_label">Pill stili</string>
 </resources>

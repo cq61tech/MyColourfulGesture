@@ -1,5 +1,9 @@
 package com.mycolourfulgesture.ui
 
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -30,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -46,51 +49,12 @@ import com.mycolourfulgesture.core.PillConfig
 import com.mycolourfulgesture.core.PillGeometry
 import com.mycolourfulgesture.hook.PillRenderer
 
-private data class Preset(val nameRes: Int, val cfg: PillConfig)
-
-private val PRESETS = listOf(
-    Preset(R.string.preset_pride, PillConfig(
-        gradient = 2, widthPct = 100, heightPct = 200, animMode = PillConfig.ANIM_FLOW, animSpeed = 70)),
-    Preset(R.string.preset_spectrum, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, animMode = PillConfig.ANIM_HUE, animSpeed = 90,
-        glowPct = 55, heightPct = 160)),
-    Preset(R.string.preset_aurora, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00E5A8.toInt(), gradient = 1, color2 = 0xFF7C4DFF.toInt(),
-        widthPct = 85, heightPct = 150, animMode = PillConfig.ANIM_FLOW, animSpeed = 80)),
-    Preset(R.string.preset_lava, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF5722.toInt(), gradient = 1, color2 = 0xFFFFC107.toInt(),
-        heightPct = 160, animMode = PillConfig.ANIM_FLOW, animSpeed = 120)),
-    Preset(R.string.preset_candy, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF80AB.toInt(), gradient = 1, color2 = 0xFF82B1FF.toInt(),
-        widthPct = 70, heightPct = 130)),
-    Preset(R.string.preset_ocean, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00B0FF.toInt(), gradient = 1, color2 = 0xFF00E5FF.toInt(),
-        widthPct = 90, heightPct = 140, animMode = PillConfig.ANIM_BREATHE, animSpeed = 70)),
-    Preset(R.string.preset_glass, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = -1, alphaPct = 45, widthPct = 80, heightPct = 150,
-        strokeDp10 = 8, strokeColor = -1)),
-    Preset(R.string.preset_neon, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFF00E5FF.toInt(), heightPct = 150, glowPct = 60,
-        animMode = PillConfig.ANIM_BREATHE)),
-    Preset(R.string.preset_sunset, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = 0xFFFF7A59.toInt(), gradient = 1,
-        color2 = 0xFFB05CC4.toInt(), widthPct = 70, heightPct = 140)),
-    Preset(R.string.preset_soft, PillConfig(
-        colorMode = PillConfig.COLOR_MONET, monetSource = 1, monetShade = 4, alphaPct = 90, heightPct = 120)),
-    Preset(R.string.preset_minimal, PillConfig(alphaPct = 70, widthPct = 40, heightPct = 60)),
-    Preset(R.string.preset_chunky, PillConfig(
-        colorMode = PillConfig.COLOR_CUSTOM, color = -1, widthPct = 60, heightPct = 280, cornerPct = 40,
-        strokeDp10 = 15, strokeColor = 0xFF000000.toInt())),
-    Preset(R.string.preset_dots, PillConfig(
-        colorMode = PillConfig.COLOR_MONET, monetSource = 1, monetShade = 5,
-        shape = PillConfig.SHAPE_DOTS, heightPct = 130)),
-)
-
 @Composable
 fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
     val cfg = state.config
     val commit = { state.commit() }
     var showSave by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     fun edit(block: (PillConfig) -> PillConfig) = state.update(block(state.config))
 
@@ -148,6 +112,13 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
                     )
                 }
             }
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    state.update(randomLook(state.config))
+                    commit()
+                },
+            ) { Text(stringResource(R.string.cust_random)) }
         }
 
         Block {
@@ -160,14 +131,77 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
                 )
             }
             state.profiles.forEachIndexed { i, p ->
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(p.name, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-                    TextButton(onClick = { state.applyProfile(i) }) { Text(stringResource(R.string.cust_apply)) }
-                    TextButton(onClick = { state.deleteProfile(i) }) { Text(stringResource(R.string.cust_delete)) }
+                Column {
+                    Text(p.name, style = MaterialTheme.typography.bodyLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        TextButton(onClick = { state.applyProfile(i) }) { Text(stringResource(R.string.cust_apply)) }
+                        TextButton(onClick = { shareText(context, state.styleText(i)) }) { Text(stringResource(R.string.cust_share)) }
+                        TextButton(onClick = { state.deleteProfile(i) }) { Text(stringResource(R.string.cust_delete)) }
+                    }
                 }
             }
             OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { showSave = true }) {
                 Text(stringResource(R.string.cust_save_style))
+            }
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    val cm = context.getSystemService(ClipboardManager::class.java)
+                    val text = cm?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+                    val ok = text != null && state.importStyleText(text)
+                    Toast.makeText(
+                        context,
+                        context.getString(if (ok) R.string.cust_paste_ok else R.string.cust_paste_fail),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                },
+            ) { Text(stringResource(R.string.cust_paste)) }
+        }
+
+        Block {
+            BlockTitle(stringResource(R.string.ctx_title))
+            Text(
+                stringResource(R.string.ctx_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            listOf(
+                "charging" to R.string.ctx_charging,
+                "low" to R.string.ctx_low,
+                "landscape" to R.string.ctx_landscape,
+            ).forEach { (name, label) ->
+                val has = state.rules.containsKey(name)
+                Text(stringResource(label), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    stringResource(if (has) R.string.ctx_active else R.string.ctx_inactive),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(modifier = Modifier.weight(1f), onClick = { state.setRule(name, state.config) }) {
+                        Text(stringResource(R.string.ctx_set))
+                    }
+                    if (has) {
+                        OutlinedButton(modifier = Modifier.weight(1f), onClick = { state.clearRule(name) }) {
+                            Text(stringResource(R.string.ctx_remove))
+                        }
+                    }
+                }
+                if (state.profiles.isNotEmpty()) {
+                    Text(
+                        stringResource(R.string.ctx_from),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(
+                        Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        state.profiles.forEach { p ->
+                            AssistChip(onClick = { state.setRule(name, p.cfg) }, label = { Text(p.name) })
+                        }
+                    }
+                }
             }
         }
 
@@ -474,4 +508,37 @@ private fun PillPreview(cfg: PillConfig) {
             }
         }
     }
+}
+
+private fun randomLook(cur: PillConfig): PillConfig {
+    val r = kotlin.random.Random
+    fun hue() = android.graphics.Color.HSVToColor(
+        floatArrayOf(r.nextFloat() * 360f, 0.55f + r.nextFloat() * 0.45f, 0.8f + r.nextFloat() * 0.2f)
+    )
+    return PillConfig(
+        hookEnabled = cur.hookEnabled,
+        debug = cur.debug,
+        enabled = true,
+        colorMode = PillConfig.COLOR_CUSTOM,
+        color = hue(),
+        gradient = if (r.nextInt(5) == 0) 2 else if (r.nextBoolean()) 1 else 0,
+        color2 = hue(),
+        color3 = hue(),
+        gradStops = r.nextInt(2, 4),
+        shape = if (r.nextInt(4) == 0) r.nextInt(1, 4) else PillConfig.SHAPE_BAR,
+        segCount = r.nextInt(2, 7),
+        gapPct = r.nextInt(50, 160),
+        widthPct = r.nextInt(40, 101),
+        heightPct = r.nextInt(80, 260),
+        cornerPct = r.nextInt(40, 101),
+        alphaPct = r.nextInt(70, 101),
+        animMode = if (r.nextInt(3) == 0) r.nextInt(1, 5) else PillConfig.ANIM_NONE,
+        glowPct = if (r.nextInt(3) == 0) r.nextInt(20, 80) else 0,
+    )
+}
+
+private fun shareText(context: Context, text: String?) {
+    if (text == null) return
+    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+    context.startActivity(Intent.createChooser(send, null))
 }

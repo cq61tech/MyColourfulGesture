@@ -13,16 +13,18 @@ import com.mycolourfulgesture.ui.theme.MyColourfulGestureTheme
 
 class MainActivity : AppCompatActivity() {
     private lateinit var settings: AppSettings
+    private lateinit var pill: PillState
 
     override fun onResume() {
         super.onResume()
         if (::settings.isInitialized) settings.bumpResume()
+        if (::pill.isInitialized) pill.reload()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settings = AppSettings(applicationContext)
-        val pill = PillState(applicationContext)
+        pill = PillState(applicationContext)
 
         setContent {
             val systemDark = isSystemInDarkTheme()

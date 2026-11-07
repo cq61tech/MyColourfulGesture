@@ -178,4 +178,22 @@
     <string name="dialog_save">Speichern</string>
     <string name="cust_tip">Tipp: Tippe auf einen Wert, um ihn genau einzugeben</string>
     <string name="preset_spectrum">Spektrum</string>
+    <string name="ctx_title">Kontextstile</string>
+    <string name="ctx_desc">Wechsle automatisch zu einem anderen Look beim Laden, bei niedrigem Akkustand oder im Querformat. Stelle zuerst den gewünschten Look ein und tippe dann auf Aktuellen Look verwenden.</string>
+    <string name="ctx_charging">Beim Laden</string>
+    <string name="ctx_low">Niedriger Akkustand (15 oder weniger)</string>
+    <string name="ctx_landscape">Querformat</string>
+    <string name="ctx_set">Aktuellen Look verwenden</string>
+    <string name="ctx_remove">Entfernen</string>
+    <string name="ctx_active">Hat einen eigenen Stil</string>
+    <string name="ctx_inactive">Wie der Hauptstil</string>
+    <string name="ctx_from">Oder einen gespeicherten Stil verwenden:</string>
+    <string name="cust_random">Überrasch mich</string>
+    <string name="cust_share">Teilen</string>
+    <string name="cust_paste">Stil aus Zwischenablage einfügen</string>
+    <string name="cust_paste_ok">Stil importiert</string>
+    <string name="cust_paste_fail">Die Zwischenablage enthält keinen Stil</string>
+    <string name="quick_monet_on">Ein</string>
+    <string name="settings_lang_system">Systemstandard</string>
+    <string name="tile_label">Pill-Stil</string>
 </resources>

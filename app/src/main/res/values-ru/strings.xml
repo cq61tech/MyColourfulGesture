@@ -178,4 +178,22 @@
     <string name="dialog_save">Сохранить</string>
     <string name="cust_tip">Совет: нажмите на значение, чтобы ввести его точно</string>
     <string name="preset_spectrum">Спектр</string>
+    <string name="ctx_title">Стили по условию</string>
+    <string name="ctx_desc">Автоматически переключайтесь на другой вид при зарядке, низком заряде или в альбомной ориентации. Сначала настройте нужный вид, затем нажмите «Использовать текущий вид».</string>
+    <string name="ctx_charging">При зарядке</string>
+    <string name="ctx_low">Низкий заряд (15 и меньше)</string>
+    <string name="ctx_landscape">Альбомная ориентация</string>
+    <string name="ctx_set">Использовать текущий вид</string>
+    <string name="ctx_remove">Убрать</string>
+    <string name="ctx_active">Есть свой стиль</string>
+    <string name="ctx_inactive">Как основной стиль</string>
+    <string name="ctx_from">Или используйте сохранённый стиль:</string>
+    <string name="cust_random">Удиви меня</string>
+    <string name="cust_share">Поделиться</string>
+    <string name="cust_paste">Вставить стиль из буфера</string>
+    <string name="cust_paste_ok">Стиль импортирован</string>
+    <string name="cust_paste_fail">В буфере нет стиля</string>
+    <string name="quick_monet_on">Вкл.</string>
+    <string name="settings_lang_system">Как в системе</string>
+    <string name="tile_label">Стиль полоски</string>
 </resources>

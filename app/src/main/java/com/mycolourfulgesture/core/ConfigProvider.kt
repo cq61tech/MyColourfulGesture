@@ -16,7 +16,12 @@ class ConfigProvider : ContentProvider() {
         return when (method) {
             ConfigContract.METHOD_GET -> {
                 if (extras != null && extras.containsKey(HookStatus.K_FRAMEWORK)) writeStatus(ctx, extras)
-                PillConfig.load(ctx.getSharedPreferences(ConfigContract.PREFS_CONFIG, Context.MODE_PRIVATE)).toBundle()
+                val out = PillConfig.load(ctx.getSharedPreferences(ConfigContract.PREFS_CONFIG, Context.MODE_PRIVATE)).toBundle()
+                RuleStore.load(ctx.getSharedPreferences(RuleStore.PREFS, Context.MODE_PRIVATE)).forEach { (n, c) ->
+                    out.putAll(c.toBundle("$n:"))
+                    out.putBoolean("$n:on", true)
+                }
+                out
             }
 
             ConfigContract.METHOD_HEARTBEAT -> {

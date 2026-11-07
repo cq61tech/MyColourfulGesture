@@ -178,4 +178,22 @@
     <string name="dialog_save">Guardar</string>
     <string name="cust_tip">Consejo: toca un valor para escribirlo con exactitud</string>
     <string name="preset_spectrum">Espectro</string>
+    <string name="ctx_title">Estilos contextuales</string>
+    <string name="ctx_desc">Cambia automáticamente de aspecto al cargar, con batería baja o en horizontal. Primero ajusta el aspecto que quieras y luego toca Usar aspecto actual.</string>
+    <string name="ctx_charging">Al cargar</string>
+    <string name="ctx_low">Batería baja (15 o menos)</string>
+    <string name="ctx_landscape">Horizontal</string>
+    <string name="ctx_set">Usar aspecto actual</string>
+    <string name="ctx_remove">Quitar</string>
+    <string name="ctx_active">Tiene estilo propio</string>
+    <string name="ctx_inactive">Igual que el estilo principal</string>
+    <string name="ctx_from">O usa un estilo guardado:</string>
+    <string name="cust_random">Sorpréndeme</string>
+    <string name="cust_share">Compartir</string>
+    <string name="cust_paste">Pegar estilo del portapapeles</string>
+    <string name="cust_paste_ok">Estilo importado</string>
+    <string name="cust_paste_fail">El portapapeles no contiene un estilo</string>
+    <string name="quick_monet_on">Sí</string>
+    <string name="settings_lang_system">Predeterminado del sistema</string>
+    <string name="tile_label">Estilo de barra</string>
 </resources>

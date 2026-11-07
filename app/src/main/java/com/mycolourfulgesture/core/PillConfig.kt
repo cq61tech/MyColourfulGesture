@@ -66,7 +66,8 @@ data class PillConfig(
         "c_stops" to gradStops, "c_segs" to segCount, "c_gap" to gapPct, "c_glow" to glowPct,
     )
 
-    fun toBundle(): Bundle = Bundle().also { bundle -> entries().forEach { (k, v) -> bundle.putInt(k, v) } }
+    fun toBundle(prefix: String = ""): Bundle =
+        Bundle().also { bundle -> entries().forEach { (k, v) -> bundle.putInt(prefix + k, v) } }
 
     fun save(sp: SharedPreferences) {
         val e = sp.edit()
@@ -128,8 +129,8 @@ data class PillConfig(
             )
         }
 
-        fun fromBundle(bundle: Bundle?): PillConfig =
-            if (bundle == null) PillConfig() else from { k, d -> bundle.getInt(k, d) }
+        fun fromBundle(bundle: Bundle?, prefix: String = ""): PillConfig =
+            if (bundle == null) PillConfig() else from { k, d -> bundle.getInt(prefix + k, d) }
 
         fun load(sp: SharedPreferences): PillConfig = from { k, d -> sp.getInt(k, d) }
 

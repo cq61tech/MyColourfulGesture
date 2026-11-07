@@ -111,7 +111,7 @@ fun AppRoot(settings: AppSettings, pill: PillState) {
                 .nestedScroll(connection)
         ) {
             when (tab) {
-                0 -> HomeScreen(settings, tail)
+                0 -> HomeScreen(settings, pill, tail)
                 1 -> CustomizationScreen(pill, tail)
                 else -> SettingsScreen(settings, pill, tail)
             }

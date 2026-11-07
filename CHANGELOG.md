@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.7.0
+
+### Features
+- Contextual styles: a different look while charging, on low battery (15 or below) or in landscape. Each one can use the current look or any saved style
+- Quick Settings tile to switch the pill customization on and off
+- Surprise me button that generates a random look
+- Share a saved style as text and paste a style from the clipboard
+- Backups now also include contextual styles
+- Home page cards now show the real current style, Monet state and matching saved style
+- "System default" option in the language picker
+
 ## v0.6.0
 
 ### More freedom

@@ -50,10 +50,12 @@ import com.mycolourfulgesture.Constants
 import com.mycolourfulgesture.core.HookStatus
 import com.mycolourfulgesture.core.isModuleActive
 import com.mycolourfulgesture.core.moduleFramework
+import com.mycolourfulgesture.PillState
 import com.mycolourfulgesture.R
+import com.mycolourfulgesture.core.PillConfig
 
 @Composable
-fun HomeScreen(settings: AppSettings, bottomPadding: Dp = 0.dp) {
+fun HomeScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0.dp) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +65,7 @@ fun HomeScreen(settings: AppSettings, bottomPadding: Dp = 0.dp) {
     ) {
         HeroCard()
         StatusCard(settings)
-        QuickCards()
+        QuickCards(pill)
         DeviceCard()
         WhatCard()
         AboutCard()
@@ -206,11 +208,24 @@ private fun StatusCard(settings: AppSettings) {
 }
 
 @Composable
-private fun QuickCards() {
+private fun QuickCards(pill: PillState) {
+    val cfg = pill.config
+    val look = cfg.copy(hookEnabled = true, debug = false, enabled = true)
+    val preset = PRESETS.firstOrNull { it.cfg == look }
+    val saved = pill.profiles.firstOrNull { it.cfg.copy(hookEnabled = true, debug = false, enabled = true) == look }
+    val style = when {
+        cfg.isIdentity -> stringResource(R.string.quick_style_default)
+        preset != null -> stringResource(preset.nameRes)
+        else -> stringResource(R.string.color_custom)
+    }
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_style), stringResource(R.string.quick_style_default))
-        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_monet), stringResource(R.string.quick_monet_off))
-        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_profile), stringResource(R.string.quick_profile_none))
+        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_style), style)
+        QuickCard(
+            Modifier.weight(1f),
+            stringResource(R.string.quick_monet),
+            stringResource(if (cfg.colorMode == PillConfig.COLOR_MONET) R.string.quick_monet_on else R.string.quick_monet_off),
+        )
+        QuickCard(Modifier.weight(1f), stringResource(R.string.quick_profile), saved?.name ?: stringResource(R.string.quick_profile_none))
     }
 }
 

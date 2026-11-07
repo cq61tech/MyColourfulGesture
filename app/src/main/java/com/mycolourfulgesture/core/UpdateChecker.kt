@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object UpdateChecker {
-    
+
     const val CODE_OFFSET = 100
 
     data class Result(

@@ -16,7 +16,6 @@ class PillHook : XposedModule() {
         }
     }
 
-    
     private fun hookSelf(param: XposedModuleInterface.PackageReadyParam) {
         try {
             val c = param.classLoader.loadClass("com.mycolourfulgesture.core.ModuleStatus")
@@ -30,7 +29,6 @@ class PillHook : XposedModule() {
 
     private val hookedKeys = HashSet<String>()
 
-    
     private fun hookLauncher(param: XposedModuleInterface.PackageReadyParam) {
         HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
         HookClient.apiVersion = apiVersion
@@ -40,7 +38,6 @@ class PillHook : XposedModule() {
         HookClient.startEarly()
     }
 
-    
     private fun hookSuppress(cls: Class<*>): String {
         var k: Class<*>? = cls
         while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
@@ -65,7 +62,6 @@ class PillHook : XposedModule() {
         return "no onDraw"
     }
 
-    
     private fun guarded(chain: XposedInterface.Chain): Any? {
         HookClient.entered += 1
         return try {
@@ -77,7 +73,6 @@ class PillHook : XposedModule() {
         }
     }
 
-    
     private fun hookDrawOf(cls: Class<*>): String {
         var k: Class<*>? = cls
         while (k != null && !k.name.startsWith("android.") && !k.name.startsWith("java.")) {
