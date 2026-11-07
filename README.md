@@ -29,5 +29,4 @@ Every push to `main` builds a debug APK through GitHub Actions and attaches it t
 
 MIT
 
----
 
