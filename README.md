@@ -17,6 +17,14 @@ Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and r
 
 On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
 
+## Signing
+
+Official builds are signed with a private release key, the SHA-256 of its certificate is printed in every build log. A build signed by anything else (your own fork, for example) will not install over an official one, and that is intended. To sign your own builds, run `scripts/make-release-key.sh` in your fork.
+
+## Reporting problems
+
+Open Settings, then Diagnostics, tap Copy report and paste it into a new issue.
+
 ## Compatibility
 
 Android 12 to 17 on 32-bit and 64-bit ARM, plus x86. The release APK is universal, so there is nothing to pick. Each build also ships a `-debug` APK that is not shrunk; use it if the main one misbehaves on your device.

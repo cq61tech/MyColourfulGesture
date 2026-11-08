@@ -1,6 +1,10 @@
 package com.mycolourfulgesture.ui
 
 import android.content.ComponentName
+import com.mycolourfulgesture.core.isModuleActive
+import android.content.Context
+import android.content.ClipboardManager
+import android.content.ClipData
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -235,6 +239,25 @@ fun SettingsScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0
             status.error?.let {
                 Text(stringResource(R.string.status_hook_error, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val cm = context.getSystemService(ClipboardManager::class.java)
+                        cm?.setPrimaryClip(ClipData.newPlainText("report", buildReport(context, status, pill)))
+                        toast(R.string.set_report_ok)
+                    },
+                ) { Text(stringResource(R.string.set_report)) }
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = { uriHandler.openUri(Constants.ISSUES_URL + "/new/choose") },
+                ) { Text(stringResource(R.string.set_report_issue)) }
+            }
+            Text(
+                stringResource(R.string.set_report_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         Block {
@@ -304,4 +327,24 @@ private fun DiagRow(label: String, value: String) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
     }
+}
+
+private fun buildReport(context: Context, status: HookStatus, pill: PillState): String {
+    val pi = runCatching { context.packageManager.getPackageInfo(context.packageName, 0) }.getOrNull()
+    val selfActive = runCatching { isModuleActive() }.getOrDefault(false)
+    return buildString {
+        appendLine("MyColourfulGesture ${pi?.versionName ?: "?"} (${pi?.longVersionCode ?: 0})")
+        appendLine("Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}), patch ${Build.VERSION.SECURITY_PATCH}")
+        appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})")
+        appendLine("ABI: ${Build.SUPPORTED_ABIS.joinToString()}")
+        appendLine("Build: ${Build.FINGERPRINT}")
+        appendLine("Launcher: ${defaultHomePackage(context) ?: "?"}")
+        appendLine("Framework: ${status.framework.ifBlank { "none" }} (API ${status.api})")
+        appendLine("Module active in app: $selfActive")
+        appendLine("Hooked class: ${status.hookedClass ?: "none"}")
+        appendLine("Entered: ${status.draws}, safe mode: ${status.safeMode}")
+        appendLine("Error: ${status.error ?: "none"}")
+        appendLine("Probe: ${status.probe ?: "none"}")
+        appendLine("Enabled: ${pill.config.enabled}, hooks: ${pill.config.hookEnabled}, stock look: ${pill.config.isIdentity}")
+    }.trim()
 }

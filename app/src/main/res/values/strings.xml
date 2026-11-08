@@ -207,4 +207,21 @@
     <string name="settings_lang_system">System default</string>
     <string name="tile_label">Pill style</string>
     <string name="set_diag_abi">CPU architecture</string>
+    <string name="status_safe">Safe mode is on. The module saw repeated restarts and switched its hooks off.</string>
+    <string name="status_safe_resume">Re-enable hooks</string>
+    <string name="wizard_title">Setup checklist</string>
+    <string name="wizard_done">Everything is set up</string>
+    <string name="wizard_root">Root access</string>
+    <string name="wizard_root_hint">Tap Check and allow the root prompt</string>
+    <string name="wizard_module">Module is enabled in LSPosed</string>
+    <string name="wizard_module_hint">Enable MyColourfulGesture in the LSPosed modules list</string>
+    <string name="wizard_self">This app is in the module scope</string>
+    <string name="wizard_self_hint">In LSPosed, tick MyColourfulGesture in the module scope</string>
+    <string name="wizard_pill">Pill is being customized</string>
+    <string name="wizard_pill_hint">Tick System UI and your launcher in the scope, then restart them</string>
+    <string name="wizard_check">Check</string>
+    <string name="set_report">Copy report</string>
+    <string name="set_report_ok">Report copied</string>
+    <string name="set_report_issue">Open issue form</string>
+    <string name="set_report_note">The report has device and module details only, nothing personal</string>
 </resources>

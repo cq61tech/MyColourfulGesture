@@ -207,4 +207,21 @@
     <string name="settings_lang_system">Sistem varsayılanı</string>
     <string name="tile_label">Pill stili</string>
     <string name="set_diag_abi">İşlemci mimarisi</string>
+    <string name="status_safe">Güvenli mod açık. Modül tekrarlayan yeniden başlatmalar gördü ve hook’larını kapattı.</string>
+    <string name="status_safe_resume">Hook’ları yeniden etkinleştir</string>
+    <string name="wizard_title">Kurulum kontrol listesi</string>
+    <string name="wizard_done">Her şey hazır</string>
+    <string name="wizard_root">Root erişimi</string>
+    <string name="wizard_root_hint">Kontrol et’e dokun ve root isteğine izin ver</string>
+    <string name="wizard_module">Modül LSPosed’da etkin</string>
+    <string name="wizard_module_hint">LSPosed modül listesinde MyColourfulGesture’ı etkinleştir</string>
+    <string name="wizard_self">Bu uygulama modül kapsamında</string>
+    <string name="wizard_self_hint">LSPosed’da modül kapsamında MyColourfulGesture’ı işaretle</string>
+    <string name="wizard_pill">Pill özelleştiriliyor</string>
+    <string name="wizard_pill_hint">Kapsamda Sistem Arayüzü’nü ve başlatıcını işaretle, sonra yeniden başlat</string>
+    <string name="wizard_check">Kontrol et</string>
+    <string name="set_report">Raporu kopyala</string>
+    <string name="set_report_ok">Rapor kopyalandı</string>
+    <string name="set_report_issue">Sorun formunu aç</string>
+    <string name="set_report_note">Rapor yalnızca cihaz ve modül bilgisi içerir, kişisel veri yoktur</string>
 </resources>

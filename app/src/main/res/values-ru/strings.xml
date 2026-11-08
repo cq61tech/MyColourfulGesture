@@ -197,4 +197,21 @@
     <string name="settings_lang_system">Как в системе</string>
     <string name="tile_label">Стиль полоски</string>
     <string name="set_diag_abi">Архитектура процессора</string>
+    <string name="status_safe">Безопасный режим включён. Модуль заметил повторные перезапуски и отключил хуки.</string>
+    <string name="status_safe_resume">Снова включить хуки</string>
+    <string name="wizard_title">Чек-лист настройки</string>
+    <string name="wizard_done">Всё настроено</string>
+    <string name="wizard_root">Доступ root</string>
+    <string name="wizard_root_hint">Нажмите «Проверить» и разрешите запрос root</string>
+    <string name="wizard_module">Модуль включён в LSPosed</string>
+    <string name="wizard_module_hint">Включите MyColourfulGesture в списке модулей LSPosed</string>
+    <string name="wizard_self">Это приложение в области действия модуля</string>
+    <string name="wizard_self_hint">В LSPosed отметьте MyColourfulGesture в области действия модуля</string>
+    <string name="wizard_pill">Полоска настраивается</string>
+    <string name="wizard_pill_hint">Отметьте в области действия System UI и ваш лаунчер, затем перезапустите их</string>
+    <string name="wizard_check">Проверить</string>
+    <string name="set_report">Копировать отчёт</string>
+    <string name="set_report_ok">Отчёт скопирован</string>
+    <string name="set_report_issue">Открыть форму обращения</string>
+    <string name="set_report_note">В отчёте только сведения об устройстве и модуле, ничего личного</string>
 </resources>

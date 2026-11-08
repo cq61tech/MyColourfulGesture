@@ -11,6 +11,7 @@ data class HookStatus(
     val error: String?,
     val probe: String?,
     val draws: Int,
+    val safeMode: Boolean,
 ) {
 
     val activeThisBoot: Boolean
@@ -28,6 +29,7 @@ data class HookStatus(
         const val K_ERROR = "error"
         const val K_PROBE = "probe"
         const val K_DRAWS = "draws"
+        const val K_SAFE = "safe"
 
         private fun slot(sp: android.content.SharedPreferences, p: String) = HookStatus(
             lastSeen = sp.getLong(p + K_TS, 0L),
@@ -37,6 +39,7 @@ data class HookStatus(
             error = sp.getString(p + K_ERROR, null)?.takeIf { it.isNotEmpty() },
             probe = sp.getString(p + K_PROBE, null)?.takeIf { it.isNotEmpty() },
             draws = sp.getInt(p + K_DRAWS, 0),
+            safeMode = sp.getBoolean(p + K_SAFE, false),
         )
 
         fun slotPrefix(pkg: String?) = if (pkg == "com.android.systemui") "s_" else "l_"

@@ -27,7 +27,23 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
+      - name: Restore signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "Signing with the release key"
+          else
+            echo "No release key found, falling back to the public debug key"
+          fi
+
       - name: Build universal release and debug APKs
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: gradle assembleRelease assembleDebug --stacktrace -PbuildNumber=${{ github.run_number }}
 
       - name: Collect APKs
@@ -44,6 +60,8 @@ jobs:
           unzip -l "$APK" | awk '{print $4}' | grep '^lib/' | cut -d/ -f2 | sort -u
           ZA=$(ls $ANDROID_HOME/build-tools/*/zipalign | sort -V | tail -1)
           "$ZA" -c -P 16 -v 4 "$APK" | tail -3
+          AS=$(ls $ANDROID_HOME/build-tools/*/apksigner | sort -V | tail -1)
+          "$AS" verify --print-certs "$APK" | grep -E "SHA-256|Signer"
 
       - uses: actions/upload-artifact@v4
         with:

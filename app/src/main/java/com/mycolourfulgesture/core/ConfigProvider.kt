@@ -16,7 +16,9 @@ class ConfigProvider : ContentProvider() {
         return when (method) {
             ConfigContract.METHOD_GET -> {
                 if (extras != null && extras.containsKey(HookStatus.K_FRAMEWORK)) writeStatus(ctx, extras)
-                val out = PillConfig.load(ctx.getSharedPreferences(ConfigContract.PREFS_CONFIG, Context.MODE_PRIVATE)).toBundle()
+                val csp = ctx.getSharedPreferences(ConfigContract.PREFS_CONFIG, Context.MODE_PRIVATE)
+                val out = PillConfig.load(csp).toBundle()
+                out.putInt("guard_token", csp.getInt("guard_token", 0))
                 RuleStore.load(ctx.getSharedPreferences(RuleStore.PREFS, Context.MODE_PRIVATE)).forEach { (n, c) ->
                     out.putAll(c.toBundle("$n:"))
                     out.putBoolean("$n:on", true)
@@ -43,6 +45,7 @@ class ConfigProvider : ContentProvider() {
             .putString(p + HookStatus.K_ERROR, extras?.getString(HookStatus.K_ERROR) ?: "")
             .putString(p + HookStatus.K_PROBE, extras?.getString(HookStatus.K_PROBE) ?: "")
             .putInt(p + HookStatus.K_DRAWS, extras?.getInt(HookStatus.K_DRAWS) ?: 0)
+            .putBoolean(p + HookStatus.K_SAFE, extras?.getBoolean(HookStatus.K_SAFE) ?: false)
             .apply()
     }
 

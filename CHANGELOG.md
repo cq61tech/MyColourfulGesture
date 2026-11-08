@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.9.0
+
+### Release signing
+- Builds are signed with a private release key kept in GitHub secrets instead of the public debug key. Anyone could sign an APK with the old key, which is not acceptable for a module that runs inside System UI
+- If no key is configured (forks, local builds) the build falls back to the public debug key
+- **This changes the signature, so the old version has to be uninstalled once before installing this one.** Updates work normally after that
+- CI prints the signing certificate fingerprint in each build log
+- `scripts/make-release-key.sh` creates the key and stores it in the repository secrets
+
+### Crash guard
+- If System UI or the launcher restarts five times within a minute, the module turns its hooks off on its own. Home shows a warning with a button to turn them back on
+- This covers the module's runtime code. Hook installation itself is covered by LSPosed's own safe mode
+
+### Setup checklist
+- Home shows a checklist for root, module, scope and whether the pill is reached, and collapses once everything is fine
+
+### Reporting problems
+- Settings has a Copy report button that gathers device, Android, launcher, framework and diagnostic details, and a button that opens the issue form
+- Issue templates ask for that report
+
 ## v0.8.0
 
 ### Compatibility

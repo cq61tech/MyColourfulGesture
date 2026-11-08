@@ -1,6 +1,11 @@
 package com.mycolourfulgesture.ui
 
 import android.os.Build
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material.icons.rounded.CheckCircle
+import android.os.Looper
+import android.os.Handler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -64,7 +69,8 @@ fun HomeScreen(settings: AppSettings, pill: PillState, bottomPadding: Dp = 0.dp)
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         HeroCard()
-        StatusCard(settings)
+        SetupCard(settings)
+        StatusCard(settings, pill)
         QuickCards(pill)
         DeviceCard()
         WhatCard()
@@ -113,7 +119,7 @@ private fun HeroCard() {
 }
 
 @Composable
-private fun StatusCard(settings: AppSettings) {
+private fun StatusCard(settings: AppSettings, pill: PillState) {
     val context = LocalContext.current
     val tick = settings.resumeTick
     val status = remember(tick) { HookStatus.read(context) }
@@ -179,6 +185,16 @@ private fun StatusCard(settings: AppSettings) {
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
+                }
+            }
+            if (status.safeMode) {
+                Text(
+                    stringResource(R.string.status_safe),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { pill.resetGuard() }) {
+                    Text(stringResource(R.string.status_safe_resume))
                 }
             }
             Text(
@@ -334,5 +350,64 @@ private fun InfoRow(label: String, value: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun SetupCard(settings: AppSettings) {
+    val context = LocalContext.current
+    val tick = settings.resumeTick
+    val status = remember(tick) { HookStatus.read(context) }
+    val selfActive = remember(tick) { runCatching { isModuleActive() }.getOrDefault(false) }
+    val root = remember { mutableIntStateOf(0) }
+    val moduleOk = status.activeThisBoot || selfActive
+    val pillOk = status.draws > 0
+    val allOk = root.intValue == 1 && moduleOk && selfActive && pillOk
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionTitle(Icons.Rounded.CheckCircle, stringResource(R.string.wizard_title))
+            if (allOk) {
+                Text(stringResource(R.string.wizard_done), style = MaterialTheme.typography.bodyMedium)
+            } else {
+                SetupRow(root.intValue == 1, stringResource(R.string.wizard_root), stringResource(R.string.wizard_root_hint)) {
+                    OutlinedButton(onClick = {
+                        Thread {
+                            val ok = try {
+                                Runtime.getRuntime().exec(arrayOf("su", "-c", "id")).waitFor() == 0
+                            } catch (_: Throwable) {
+                                false
+                            }
+                            Handler(Looper.getMainLooper()).post { root.intValue = if (ok) 1 else 2 }
+                        }.start()
+                    }) { Text(stringResource(R.string.wizard_check)) }
+                }
+                SetupRow(moduleOk, stringResource(R.string.wizard_module), stringResource(R.string.wizard_module_hint))
+                SetupRow(selfActive, stringResource(R.string.wizard_self), stringResource(R.string.wizard_self_hint))
+                SetupRow(pillOk, stringResource(R.string.wizard_pill), stringResource(R.string.wizard_pill_hint))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SetupRow(ok: Boolean, title: String, hint: String, action: (@Composable () -> Unit)? = null) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            if (ok) Icons.Rounded.CheckCircle else Icons.Rounded.Warning,
+            contentDescription = null,
+            tint = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+        )
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            if (!ok) {
+                Text(hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        if (!ok && action != null) action()
     }
 }

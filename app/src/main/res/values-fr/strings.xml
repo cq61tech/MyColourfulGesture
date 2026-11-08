@@ -197,4 +197,21 @@
     <string name="settings_lang_system">Par défaut du système</string>
     <string name="tile_label">Style de la barre</string>
     <string name="set_diag_abi">Architecture du processeur</string>
+    <string name="status_safe">Le mode sans échec est actif. Le module a détecté des redémarrages répétés et a désactivé ses hooks.</string>
+    <string name="status_safe_resume">Réactiver les hooks</string>
+    <string name="wizard_title">Liste de configuration</string>
+    <string name="wizard_done">Tout est configuré</string>
+    <string name="wizard_root">Accès root</string>
+    <string name="wizard_root_hint">Touchez Vérifier et autorisez la demande root</string>
+    <string name="wizard_module">Le module est activé dans LSPosed</string>
+    <string name="wizard_module_hint">Activez MyColourfulGesture dans la liste des modules LSPosed</string>
+    <string name="wizard_self">Cette appli est dans la portée du module</string>
+    <string name="wizard_self_hint">Dans LSPosed, cochez MyColourfulGesture dans la portée du module</string>
+    <string name="wizard_pill">La barre est personnalisée</string>
+    <string name="wizard_pill_hint">Cochez System UI et votre lanceur dans la portée, puis redémarrez-les</string>
+    <string name="wizard_check">Vérifier</string>
+    <string name="set_report">Copier le rapport</string>
+    <string name="set_report_ok">Rapport copié</string>
+    <string name="set_report_issue">Ouvrir le formulaire</string>
+    <string name="set_report_note">Le rapport ne contient que des infos sur l’appareil et le module, rien de personnel</string>
 </resources>

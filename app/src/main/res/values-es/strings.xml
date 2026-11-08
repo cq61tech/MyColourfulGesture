@@ -197,4 +197,21 @@
     <string name="settings_lang_system">Predeterminado del sistema</string>
     <string name="tile_label">Estilo de barra</string>
     <string name="set_diag_abi">Arquitectura de CPU</string>
+    <string name="status_safe">El modo seguro está activo. El módulo detectó reinicios repetidos y desactivó sus hooks.</string>
+    <string name="status_safe_resume">Reactivar hooks</string>
+    <string name="wizard_title">Lista de configuración</string>
+    <string name="wizard_done">Todo está configurado</string>
+    <string name="wizard_root">Acceso root</string>
+    <string name="wizard_root_hint">Toca Comprobar y permite la solicitud de root</string>
+    <string name="wizard_module">El módulo está activado en LSPosed</string>
+    <string name="wizard_module_hint">Activa MyColourfulGesture en la lista de módulos de LSPosed</string>
+    <string name="wizard_self">Esta app está en el ámbito del módulo</string>
+    <string name="wizard_self_hint">En LSPosed, marca MyColourfulGesture en el ámbito del módulo</string>
+    <string name="wizard_pill">La barra se está personalizando</string>
+    <string name="wizard_pill_hint">Marca System UI y tu launcher en el ámbito y reinícialos</string>
+    <string name="wizard_check">Comprobar</string>
+    <string name="set_report">Copiar informe</string>
+    <string name="set_report_ok">Informe copiado</string>
+    <string name="set_report_issue">Abrir formulario de incidencia</string>
+    <string name="set_report_note">El informe solo incluye datos del dispositivo y del módulo, nada personal</string>
 </resources>

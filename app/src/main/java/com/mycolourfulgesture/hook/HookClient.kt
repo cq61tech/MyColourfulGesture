@@ -37,6 +37,7 @@ object HookClient {
     @Volatile var viewInfo: String? = null
     @Volatile var draws: Int = 0
     @Volatile var entered: Int = 0
+    @Volatile var safeMode: Boolean = false
     @Volatile var errors: Int = 0
     @Volatile var discovery: String? = null
     @Volatile var hooker: ((Class<*>) -> String)? = null
@@ -63,6 +64,7 @@ object HookClient {
     private var merged: PillConfig? = null
 
     val config: PillConfig? get() {
+        if (safeMode) return null
         val ctx = appContext ?: return base
         return current(ctx)
     }
@@ -149,6 +151,9 @@ object HookClient {
 
     private fun start(ctx: Context) {
         appContext = ctx
+        safeMode = CrashGuard.onStart(ctx)
+        if (safeMode) log(Log.WARN, "safe mode: repeated restarts detected, hooks are off")
+        main.postDelayed({ CrashGuard.markStable(ctx) }, 120_000L)
         val thread = HandlerThread("MCG-config").also { it.start() }
         val h = Handler(thread.looper)
         handler = h
@@ -209,6 +214,7 @@ object HookClient {
                 "${discovery ?: ""} ${viewInfo ?: ""}").trim().take(480),
         )
         putInt(HookStatus.K_DRAWS, entered)
+        putBoolean(HookStatus.K_SAFE, safeMode)
     }
 
     private fun load(attempt: Int) {
@@ -216,6 +222,7 @@ object HookClient {
         try {
             val b = ctx.contentResolver.call(ConfigContract.URI, ConfigContract.METHOD_GET, null, buildExtras())
             val cfg = PillConfig.fromBundle(b)
+            if (b != null) CrashGuard.applyToken(ctx, b.getInt("guard_token", 0))
             base = cfg
             rules = if (b == null) emptyMap() else RuleStore.NAMES
                 .filter { b.getBoolean("$it:on", false) }
@@ -245,6 +252,7 @@ object HookClient {
 
     // pencere ağacında pill view'ını bulur ve ilk bulunanı stillendirir
     private fun discover() {
+        if (safeMode) return
         val found = ArrayList<View>()
         val names = LinkedHashSet<String>()
         var roots = 0

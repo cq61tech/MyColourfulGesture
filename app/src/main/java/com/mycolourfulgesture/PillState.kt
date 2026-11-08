@@ -38,6 +38,11 @@ class PillState(context: Context) {
         app.contentResolver.notifyChange(ConfigContract.URI, null)
     }
 
+    fun resetGuard() {
+        sp.edit().putInt("guard_token", sp.getInt("guard_token", 0) + 1).apply()
+        app.contentResolver.notifyChange(ConfigContract.URI, null)
+    }
+
     fun reload() {
         config = PillConfig.load(sp)
     }

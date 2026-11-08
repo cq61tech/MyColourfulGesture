@@ -197,4 +197,21 @@
     <string name="settings_lang_system">Systemstandard</string>
     <string name="tile_label">Pill-Stil</string>
     <string name="set_diag_abi">CPU-Architektur</string>
+    <string name="status_safe">Der abgesicherte Modus ist aktiv. Das Modul hat wiederholte Neustarts bemerkt und seine Hooks abgeschaltet.</string>
+    <string name="status_safe_resume">Hooks wieder aktivieren</string>
+    <string name="wizard_title">Einrichtungs-Checkliste</string>
+    <string name="wizard_done">Alles eingerichtet</string>
+    <string name="wizard_root">Root-Zugriff</string>
+    <string name="wizard_root_hint">Tippe auf Prüfen und erlaube die Root-Anfrage</string>
+    <string name="wizard_module">Modul ist in LSPosed aktiviert</string>
+    <string name="wizard_module_hint">Aktiviere MyColourfulGesture in der LSPosed-Modulliste</string>
+    <string name="wizard_self">Diese App ist im Modulbereich</string>
+    <string name="wizard_self_hint">Wähle in LSPosed MyColourfulGesture im Modulbereich aus</string>
+    <string name="wizard_pill">Die Pill wird angepasst</string>
+    <string name="wizard_pill_hint">Wähle System UI und deinen Launcher im Bereich aus und starte beide neu</string>
+    <string name="wizard_check">Prüfen</string>
+    <string name="set_report">Bericht kopieren</string>
+    <string name="set_report_ok">Bericht kopiert</string>
+    <string name="set_report_issue">Fehlerformular öffnen</string>
+    <string name="set_report_note">Der Bericht enthält nur Geräte- und Modulangaben, nichts Persönliches</string>
 </resources>
