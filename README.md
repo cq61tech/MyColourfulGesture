@@ -1,5 +1,7 @@
 # MyColourfulGesture
 
+![Logo](screenshots/logo.png)
+
 LSPosed module that restyles the gesture pill on Pixel and AOSP-based ROMs (Android 12-17), with a small companion app.
 
 Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and rainbow gradients, bar / dot / dots / dashes, size, corner radius, offset, outline, glow, animations, presets, your own saved styles, contextual styles (charging, low battery, landscape), a Quick Settings tile, backup and restore.
@@ -16,6 +18,12 @@ Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and r
 3. Restart System UI and the launcher from the home page.
 
 On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
+
+## Screenshots
+![Ekran Görüntüsü 1](screenshots/1.png)
+![Ekran Görüntüsü 2](screenshots/2.png)
+![Ekran Görüntüsü 3](screenshots/3.png)
+![Ekran Görüntüsü 4](screenshots/4.png)
 
 ## Signing
 
