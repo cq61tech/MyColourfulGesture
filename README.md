@@ -21,13 +21,16 @@ On newer Android versions the pill is drawn by the launcher's taskbar, so the la
 
 ## Screenshots
 
-![Ekran Görüntüsü 1](screenshots/1.png)
+<p align="center">
+  <img src="screenshots/1.png" width="200" alt="Ekran 1" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/2.png" width="200" alt="Ekran 2" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/3.png" width="200" alt="Ekran 3" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/4.png" width="200" alt="Ekran 4" />
+</p>
 
-![Ekran Görüntüsü 2](screenshots/2.png)
-
-![Ekran Görüntüsü 3](screenshots/3.png)
-
-![Ekran Görüntüsü 4](screenshots/4.png)
 
 ## Signing
 
