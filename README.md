@@ -20,9 +20,13 @@ Color (stock / custom / Monet with a full HSV and HEX editor), multi-color and r
 On newer Android versions the pill is drawn by the launcher's taskbar, so the launcher has to be in scope.
 
 ## Screenshots
+
 ![Ekran Görüntüsü 1](screenshots/1.png)
+
 ![Ekran Görüntüsü 2](screenshots/2.png)
+
 ![Ekran Görüntüsü 3](screenshots/3.png)
+
 ![Ekran Görüntüsü 4](screenshots/4.png)
 
 ## Signing
