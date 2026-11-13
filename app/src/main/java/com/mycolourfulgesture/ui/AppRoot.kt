@@ -72,7 +72,6 @@ fun AppRoot(settings: AppSettings, pill: PillState) {
 
     LaunchedEffect(tab, floating) { dockVisible = true }
 
-    // aşağı kaydırınca dock gizlenir, yukarı kaydırınca döner
     val connection = remember(autoHide) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {

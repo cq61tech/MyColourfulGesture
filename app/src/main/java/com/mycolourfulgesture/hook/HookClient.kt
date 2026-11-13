@@ -69,7 +69,6 @@ object HookClient {
         return current(ctx)
     }
 
-    // düşük pil > şarj > yatay sırasıyla, tanımlı olan ilk kural geçerli olur
     private fun current(ctx: Context): PillConfig? {
         val b = base ?: return null
         if (rules.isEmpty()) return b
@@ -250,7 +249,6 @@ object HookClient {
         }
     }
 
-    // pencere ağacında pill view'ını bulur ve ilk bulunanı stillendirir
     private fun discover() {
         if (safeMode) return
         val found = ArrayList<View>()

@@ -3,7 +3,6 @@ package com.mycolourfulgesture.hook
 import android.app.Application
 import android.content.Context
 
-// süreç kısa sürede üst üste açılıyorsa (açılış döngüsü) modül kendini kapatır
 object CrashGuard {
     private const val PREFS = "mcg_guard"
     private const val WINDOW_MS = 60_000L
@@ -31,7 +30,6 @@ object CrashGuard {
         sp.edit().putString(key, "").apply()
     }
 
-    // uygulamadan gelen "yeniden etkinleştir" isteği: bir sonraki başlatmada normal çalışır
     fun applyToken(ctx: Context, token: Int) {
         val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         if (sp.getInt("seen", 0) != token) {

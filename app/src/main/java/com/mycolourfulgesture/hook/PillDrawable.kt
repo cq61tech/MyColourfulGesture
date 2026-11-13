@@ -11,7 +11,6 @@ import com.mycolourfulgesture.core.PillConfig
 import com.mycolourfulgesture.core.PillGeometry
 import java.lang.ref.WeakReference
 
-// ColorDrawable: orijinal kod arka planı ColorDrawable sanıp cast ederse çökmesin
 class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE) {
     @Volatile var cfg: PillConfig? = null
     private val ref = WeakReference(view)
@@ -19,7 +18,6 @@ class PillDrawable(view: View, stock: Int?) : ColorDrawable(stock ?: Color.WHITE
     private val tmp = Rect()
     private val stockR = RectF()
 
-    // launcher'da view tüm nav alanı kadar, asıl pill outline içinde küçük bir dikdörtgen
     private fun readStock(view: View, w: Float, h: Float, d: Float) {
         try {
             val p = view.outlineProvider

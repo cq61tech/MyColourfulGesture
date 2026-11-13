@@ -1,29 +1,24 @@
 name: Bug report
-description: Something does not work as expected
+description: Something does not work
 labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: |
-        In the app, open Settings, then Diagnostics, tap **Copy report** and paste it below.
-        Reports without it are very hard to act on, because every ROM and launcher behaves differently.
+      value: Paste the report from Settings > Diagnostics > Copy report.
   - type: textarea
     id: what
     attributes:
       label: What happened
-      description: What did you expect and what did you get instead?
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
-    validations:
-      required: false
   - type: textarea
     id: report
     attributes:
-      label: Compatibility report
+      label: Report
       render: text
     validations:
       required: true
@@ -33,5 +28,5 @@ body:
       label: Checked
       options:
         - label: LSPosed is 2.0.1 or newer
-        - label: System UI, this app and my launcher are ticked in the module scope
+        - label: System UI, this app and my launcher are in the scope
         - label: I restarted System UI and the launcher after changing the scope

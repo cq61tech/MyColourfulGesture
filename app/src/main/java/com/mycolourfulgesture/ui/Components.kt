@@ -293,7 +293,6 @@ internal fun restartProcess(context: Context, pkg: String) {
         var ok = false
         try {
             val last = if (pkg == "com.android.systemui") "am crash $pkg" else "am force-stop $pkg"
-            // bazı ROM'larda killall yok, sırayla dene
             val cmd = "killall $pkg || pkill -f $pkg || $last"
             ok = Runtime.getRuntime().exec(arrayOf("su", "-c", cmd)).waitFor() == 0
         } catch (_: Throwable) {

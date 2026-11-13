@@ -32,7 +32,6 @@ android {
         }
     }
 
-    // CI gizli anahtarı verirse onunla imzalanır; yoksa depodaki açık debug anahtarına düşer
     val releaseKeystore = System.getenv("KEYSTORE_FILE")?.let { file(it) }?.takeIf { it.exists() }
     signingConfigs {
         create("release") {

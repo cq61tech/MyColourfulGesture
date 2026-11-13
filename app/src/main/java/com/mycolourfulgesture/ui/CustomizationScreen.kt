@@ -475,7 +475,6 @@ fun CustomizationScreen(state: PillState, bottomPadding: Dp = 0.dp) {
     }
 }
 
-// önizleme gerçek çizim motorunu kullanır, bu yüzden hook'taki görünümle aynıdır
 @Composable
 private fun PillPreview(cfg: PillConfig) {
     val context = LocalContext.current

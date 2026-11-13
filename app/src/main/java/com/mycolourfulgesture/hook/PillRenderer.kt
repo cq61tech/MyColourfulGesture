@@ -31,7 +31,6 @@ object PillRenderer {
     private var monetAt = 0L
     private var monetColor = Color.WHITE
 
-    // true dönerse animasyon için yeni kare gerekir
     fun render(
         canvas: Canvas, ctx: Context, cfg: PillConfig,
         left: Float, top: Float, totalW: Float, pillH: Float, corner: Float,
@@ -122,7 +121,6 @@ object PillRenderer {
         return n
     }
 
-    // inset > 0 içe, < 0 dışa doğru (parıltı katmanları için)
     private fun drawShape(
         c: Canvas, p: Paint, left: Float, top: Float, totalW: Float, h: Float,
         corner: Float, cfg: PillConfig, inset: Float,
