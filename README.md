@@ -57,5 +57,3 @@ Every push to `main` builds a debug APK through GitHub Actions and attaches it t
 MIT
 
 ---
-
-Pixel ve AOSP tabanlı ROM'larda (Android 12-17) hareket çubuğunu özelleştiren LSPosed modülü. Kurulum için LSPosed 2.0.1+ ve root gerekir; kapsama Sistem Arayüzü, uygulamanın kendisi ve başlatıcı eklenmelidir.
