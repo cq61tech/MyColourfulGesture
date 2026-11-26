@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
                 amoled = settings.amoled.value,
             ) {
                 AppRoot(settings, pill)
+                com.mycolourfulgesture.ui.CqStorePromptDialog()
             }
         }
     }
