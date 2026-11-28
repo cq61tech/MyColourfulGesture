@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import android.database.ContentObserver
 import android.os.BatteryManager
 import android.os.Build
@@ -21,6 +22,8 @@ import com.mycolourfulgesture.core.PillConfig
 import com.mycolourfulgesture.core.RuleStore
 import java.util.Collections
 import java.util.WeakHashMap
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicBoolean
 
 private val HANDLE_IDS = setOf(
@@ -44,6 +47,12 @@ object HookClient {
     @Volatile var suppressHooker: ((Class<*>) -> String)? = null
     @Volatile var pkg: String = ""
     @Volatile var logger: ((Int, String) -> Unit)? = null
+    @Volatile var hintSetDarkMethod: Method? = null
+
+    private val hintLock = Any()
+    private val hintDrawables = WeakHashMap<Drawable, Float?>()
+    private val hiddenChildren = WeakHashMap<View, Int>()
+    private val hintFieldCache = HashMap<String, Field?>()
 
     private val views: MutableSet<View> =
         Collections.synchronizedSet(Collections.newSetFromMap(WeakHashMap<View, Boolean>()))
@@ -67,6 +76,11 @@ object HookClient {
         if (safeMode) return null
         val ctx = appContext ?: return base
         return current(ctx)
+    }
+
+    val isActive: Boolean get() {
+        val c = config ?: return false
+        return c.hookEnabled && c.enabled && !c.isIdentity
     }
 
     private fun current(ctx: Context): PillConfig? {
@@ -173,7 +187,10 @@ object HookClient {
                 override fun onReceive(c: Context, i: Intent) {
                     updateBattery(i)
                     invalidateAll()
-                    main.post { applyStylesNow() }
+                    main.post {
+                        applyStylesNow()
+                        applyHintSuppression()
+                    }
                 }
             }, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             if (sticky != null) updateBattery(sticky)
@@ -231,7 +248,10 @@ object HookClient {
                 log(Log.INFO, "config loaded (attempt $attempt): identity=${cfg.isIdentity} enabled=${cfg.enabled} hook=${cfg.hookEnabled}")
             }
             invalidateAll()
-            main.post { applyStylesNow() }
+            main.post {
+                applyStylesNow()
+                applyHintSuppression()
+            }
         } catch (t: Throwable) {
             log(Log.WARN, "config load failed (attempt $attempt): ${t.javaClass.simpleName}: ${t.message}")
             if (attempt < 20) handler?.postDelayed({ load(attempt + 1) }, 3000L)
@@ -333,6 +353,93 @@ object HookClient {
         if (v.id != View.NO_ID) v.resources.getResourceEntryName(v.id) else ""
     } catch (_: Throwable) {
         ""
+    }
+
+    fun onSamsungHintDrawable(d: Drawable, intensity: Float?) {
+        synchronized(hintLock) {
+            if (intensity != null || !hintDrawables.containsKey(d)) {
+                hintDrawables[d] = intensity
+            }
+        }
+        if (isActive) {
+            try {
+                d.alpha = 0
+                d.invalidateSelf()
+            } catch (_: Throwable) {
+            }
+        }
+    }
+
+    fun syncSamsungHint(view: View, active: Boolean) {
+        try {
+            val f = synchronized(hintFieldCache) {
+                hintFieldCache.getOrPut(view.javaClass.name) {
+                    var k: Class<*>? = view.javaClass
+                    var found: Field? = null
+                    while (k != null && found == null) {
+                        try {
+                            found = k.getDeclaredField("mHintDrawable").apply { isAccessible = true }
+                        } catch (_: NoSuchFieldException) {
+                            k = k.superclass
+                        }
+                    }
+                    found
+                }
+            }
+            val hd = f?.get(view) as? Drawable
+            if (hd != null) {
+                val savedIntensity = synchronized(hintLock) {
+                    if (!hintDrawables.containsKey(hd)) hintDrawables[hd] = null
+                    hintDrawables[hd]
+                }
+                applyDrawableSuppression(hd, savedIntensity, active)
+            }
+        } catch (_: Throwable) {
+        }
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val child = view.getChildAt(i) ?: continue
+                if (active) {
+                    if (child.visibility == View.VISIBLE) {
+                        synchronized(hintLock) { hiddenChildren[child] = View.VISIBLE }
+                        child.visibility = View.INVISIBLE
+                    }
+                } else {
+                    val prev = synchronized(hintLock) { hiddenChildren.remove(child) }
+                    if (prev != null && child.visibility != prev) {
+                        child.visibility = prev
+                    }
+                }
+            }
+        }
+    }
+
+    private fun applyDrawableSuppression(d: Drawable, savedIntensity: Float?, active: Boolean) {
+        try {
+            if (active) {
+                if (d.alpha != 0) {
+                    d.alpha = 0
+                    d.invalidateSelf()
+                }
+            } else {
+                val m = hintSetDarkMethod
+                if (m != null && savedIntensity != null) {
+                    m.invoke(d, savedIntensity)
+                } else {
+                    d.alpha = 255
+                }
+                d.invalidateSelf()
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
+    private fun applyHintSuppression() {
+        val active = isActive
+        val viewSnap = synchronized(views) { views.toList() }
+        viewSnap.forEach { syncSamsungHint(it, active) }
+        val drawSnap = synchronized(hintLock) { hintDrawables.entries.map { it.key to it.value } }
+        drawSnap.forEach { (d, intensity) -> applyDrawableSuppression(d, intensity, active) }
     }
 
     private fun invalidateAll() {

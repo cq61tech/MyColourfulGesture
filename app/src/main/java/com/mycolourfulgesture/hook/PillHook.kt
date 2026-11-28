@@ -1,7 +1,10 @@
 package com.mycolourfulgesture.hook
 
+import android.app.Application
 import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.util.Log
+import android.view.View
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface
@@ -12,6 +15,7 @@ class PillHook : XposedModule() {
         when (param.packageName) {
             SYSTEMUI -> hookSystemUi(param)
             OWN_PACKAGE -> hookSelf(param)
+            "android" -> return
             else -> hookLauncher(param)
         }
     }
@@ -94,6 +98,8 @@ class PillHook : XposedModule() {
     }
 
     private fun hookSystemUi(param: XposedModuleInterface.PackageReadyParam) {
+        val proc = try { Application.getProcessName() } catch (_: Throwable) { SYSTEMUI }
+        if (proc != null && proc != SYSTEMUI) return
         HookClient.frameworkInfo = "$frameworkName $frameworkVersion"
         HookClient.apiVersion = apiVersion
         HookClient.logger = { priority, msg -> log(priority, TAG, msg) }
@@ -111,6 +117,7 @@ class PillHook : XposedModule() {
                 HookClient.hookedClass = name
                 HookClient.hookError = null
                 log(Log.INFO, TAG, "Hooked $name.onDraw")
+                hookSamsungOneUiHints(param.classLoader, clazz)
                 return
             } catch (_: ClassNotFoundException) {
             } catch (t: Throwable) {
@@ -120,6 +127,47 @@ class PillHook : XposedModule() {
         }
         HookClient.hookError = lastError ?: "NavigationHandle not found"
         log(Log.WARN, TAG, "No handle class hooked: ${HookClient.hookError}")
+    }
+
+    private fun hookSamsungOneUiHints(cl: ClassLoader, handleClass: Class<*>) {
+        try {
+            val setImg = handleClass.getDeclaredMethod("setImageDrawable", Drawable::class.java)
+            hook(setImg).intercept(XposedInterface.Hooker { chain ->
+                val res = chain.proceed()
+                try {
+                    val d = chain.args.firstOrNull() as? Drawable
+                    if (d != null) HookClient.onSamsungHintDrawable(d, null)
+                    (chain.thisObject as? View)?.let { HookClient.syncSamsungHint(it, HookClient.isActive) }
+                } catch (_: Throwable) {
+                }
+                res
+            })
+            log(Log.INFO, TAG, "Hooked ${handleClass.simpleName}.setImageDrawable (One UI)")
+        } catch (_: NoSuchMethodException) {
+        } catch (t: Throwable) {
+            log(Log.WARN, TAG, "One UI setImageDrawable hook failed: ${t.javaClass.simpleName}")
+        }
+
+        try {
+            val hintCls = cl.loadClass("com.android.systemui.navigationbar.gestural.GestureHintDrawable")
+            val setDark = hintCls.getDeclaredMethod("setDarkIntensity", Float::class.javaPrimitiveType)
+            HookClient.hintSetDarkMethod = setDark
+            hook(setDark).intercept(XposedInterface.Hooker { chain ->
+                val res = chain.proceed()
+                try {
+                    val d = chain.thisObject as? Drawable
+                    val intensity = (chain.args.firstOrNull() as? Number)?.toFloat()
+                    if (d != null) HookClient.onSamsungHintDrawable(d, intensity)
+                } catch (_: Throwable) {
+                }
+                res
+            })
+            log(Log.INFO, TAG, "Hooked GestureHintDrawable.setDarkIntensity (One UI)")
+        } catch (_: ClassNotFoundException) {
+        } catch (_: NoSuchMethodException) {
+        } catch (t: Throwable) {
+            log(Log.WARN, TAG, "One UI GestureHintDrawable hook failed: ${t.javaClass.simpleName}")
+        }
     }
 
     private companion object {

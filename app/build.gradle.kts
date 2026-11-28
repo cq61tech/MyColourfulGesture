@@ -14,8 +14,8 @@ android {
         applicationId = "com.mycolourfulgesture"
         minSdk = 31
         targetSdk = 36
-        versionCode = 100 + (buildNumber ?: 0)
-        versionName = "0.9.0" + (if (buildNumber != null) "-b$buildNumber" else "")
+        versionCode = 101 + (buildNumber ?: 0)
+        versionName = "0.9.1" + (if (buildNumber != null) "-b$buildNumber" else "")
 
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")

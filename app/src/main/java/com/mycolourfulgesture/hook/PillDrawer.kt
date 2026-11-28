@@ -26,8 +26,12 @@ object PillDrawer {
             HookClient.sendHeartbeatAsync()
         }
         val cfg = HookClient.config
-        if (cfg == null || !cfg.hookEnabled || !cfg.enabled || cfg.isIdentity) return chain.proceed()
+        if (cfg == null || !cfg.hookEnabled || !cfg.enabled || cfg.isIdentity) {
+            HookClient.syncSamsungHint(view, false)
+            return chain.proceed()
+        }
 
+        HookClient.syncSamsungHint(view, true)
         return try {
             draw(view, canvas, cfg)
             null
